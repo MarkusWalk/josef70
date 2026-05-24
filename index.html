@@ -210,12 +210,12 @@ push({ type:'item', kind:'star', x: 5340, y: -40 });
 // === 1979 Hochzeit Dorothee ===
 push({ type:'sign', x: 5470, text:'1980 · Hochzeit Dorothee' });
 push({ type:'scenery', kind:'chapel', x: 5580, y: 0 });
-push({ type:'scenery', kind:'bride', x: 5680, y: 0 });
+push({ type:'npc', kind:'bride', x: 5680, y: 0 });
 push({ type:'item', kind:'heart', x: 5760, y: -42 });
 
 // === 1980 Sohn Martin ===
 push({ type:'sign', x: 5870, text:'1980 · Martin geboren' });
-push({ type:'scenery', kind:'cradle', x: 5980, y: 0 });
+push({ type:'npc', kind:'cradle', x: 5980, y: 0 });
 push({ type:'item', kind:'heart', x: 6060, y: -38 });
 push({ type:'obstacle', kind:'stone', x: 6130, w:18, h:14 });
 
@@ -254,13 +254,13 @@ push({ type:'item', kind:'star', x: 8580, y: -38 });
 
 // === 2017 Enkelin Hannah ===
 push({ type:'sign', x: 8770, text:'2017 · Enkelin Hannah' });
-push({ type:'scenery', kind:'hannah', x: 8870, y: 0 });
+push({ type:'npc', kind:'hannah', x: 8870, y: 0 });
 push({ type:'item', kind:'heart', x: 8950, y: -42 });
 push({ type:'item', kind:'star', x: 9030, y: -38 });
 
 // === 2019 Enkelin Linda ===
 push({ type:'sign', x: 9170, text:'2019 · Enkelin Linda' });
-push({ type:'scenery', kind:'linda', x: 9270, y: 0 });
+push({ type:'npc', kind:'linda', x: 9270, y: 0 });
 push({ type:'item', kind:'heart', x: 9350, y: -42 });
 push({ type:'item', kind:'star', x: 9430, y: -38 });
 
@@ -1253,22 +1253,39 @@ function update(dt) {
 
   for (const it of things) {
     if (it.collected) continue;
-    if (it.type !== 'item') continue;
-    const iy = gy + (it.y || -8);
-    const ix = it.x;
-    if (player.x + player.w > ix && player.x < ix + 10 &&
-        player.y + player.h > iy && player.y < iy + 10) {
-      it.collected = true;
-      score++;
-      hudScore.textContent = score;
-      const labels = {
-        star:'+1 ⭐', heart:'+1 ❤️', dmark:'+1 💰 D-Mark', vinyl:'+1 💿 Schallplatte',
-        brezel:'+1 🥨 Brezn!', leberkaes:'+1 🥩 Leberkäs!',
-        nurnberger:'+1 🌭 Nürnberger!', schaeufele:'+1 🍖 Schäufele!',
-        turmeulen:'+1 🦉 Turmeule!', wellington:'+1 🥩 Wellington!',
-        zipferl:'+1 🌶️ Saure Zipferl!', bier:'+1 🍺 Bier!',
-      };
-      showToast(labels[it.kind] || '+1', 800);
+    if (it.type === 'item') {
+      const iy = gy + (it.y || -8);
+      const ix = it.x;
+      if (player.x + player.w > ix && player.x < ix + 10 &&
+          player.y + player.h > iy && player.y < iy + 10) {
+        it.collected = true;
+        score++;
+        hudScore.textContent = score;
+        const labels = {
+          star:'+1 ⭐', heart:'+1 ❤️', dmark:'+1 💰 D-Mark', vinyl:'+1 💿 Schallplatte',
+          brezel:'+1 🥨 Brezn!', leberkaes:'+1 🥩 Leberkäs!',
+          nurnberger:'+1 🌭 Nürnberger!', schaeufele:'+1 🍖 Schäufele!',
+          turmeulen:'+1 🦉 Turmeule!', wellington:'+1 🥩 Wellington!',
+          zipferl:'+1 🌶️ Saure Zipferl!', bier:'+1 🍺 Bier!',
+        };
+        showToast(labels[it.kind] || '+1', 800);
+      }
+    } else if (it.type === 'npc') {
+      const ix = it.x;
+      const iw = 20, ih = 40;
+      if (player.x + player.w > ix - 4 && player.x < ix + iw &&
+          player.y + player.h > gy - ih && player.y < gy) {
+        it.collected = true;
+        score++;
+        hudScore.textContent = score;
+        const greets = {
+          bride:  'Ja, ich will! 💍 Dorothee ❤️',
+          cradle: 'Hallo Papa! 👶 Martin',
+          hannah: 'Hi Opa! 🌸 — Hannah',
+          linda:  'Hi Opa! 🌸 — Linda',
+        };
+        showToast(greets[it.kind] || 'Hallo!', 1400);
+      }
     }
   }
 
@@ -1370,6 +1387,14 @@ function render() {
       drawObstacle(t, gy);
     } else if (t.type === 'item' && !t.collected) {
       drawItem(t, t.x, gy + (t.y || -8));
+    } else if (t.type === 'npc' && !t.collected) {
+      const sx = t.x;
+      switch (t.kind) {
+        case 'bride':  drawBride(sx, gy); break;
+        case 'cradle': drawCradle(sx, gy); break;
+        case 'hannah': drawHannah(sx, gy); break;
+        case 'linda':  drawLinda(sx, gy); break;
+      }
     } else if (t.type === 'goal') {
       drawCake(t.x, gy);
     }
