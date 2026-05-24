@@ -361,15 +361,21 @@ const JOSEF_JUMP = [
   "..N......N..",
   ".ZZZ....ZZZ.",
 ];
-// Body-only palette (head will be replaced with real photo)
-const JOSEF_PAL = {
+// Volle Palette (Pixel-Kopf als Fallback wenn Foto nicht geladen)
+const JOSEF_PAL_FULL = {
+  H:'#2d5a1a', S:'#f0f0f0', D:'#f4f4f4', K:'#f4caa0',
+  O:'#1a1a1a', W:'#ffffff', C:'#3464a8', B:'#6a3a14',
+  Y:'#caa050', N:'#e8d8a0', Z:'#1a1a1a',
+};
+const JOSEF_PAL_BODY = {
   W:'#ffffff', C:'#3464a8', B:'#6a3a14',
   Y:'#caa050', N:'#e8d8a0', Z:'#1a1a1a',
 };
 
 const josefImg = new Image();
 let josefImgReady = false;
-josefImg.onload = () => { josefImgReady = true; };
+josefImg.onload  = () => { josefImgReady = true; console.log('Josef-Foto geladen'); };
+josefImg.onerror = () => { console.warn('Josef-Foto nicht ladbar — Pixel-Kopf bleibt'); };
 josefImg.src = 'josef.png';
 
 function drawJosef() {
@@ -377,13 +383,12 @@ function drawJosef() {
     : (Math.abs(player.vx) > 0.5 ? (Math.floor(player.walkPhase) % 2 === 0 ? JOSEF_WALK : JOSEF_STAND) : JOSEF_STAND);
   if (player.hurtT > 0 && Math.floor(player.hurtT * 20) % 2 === 0) return;
   const px0 = Math.round(player.x), py0 = Math.round(player.y);
-  // Body
-  spr(grid, px0, py0, JOSEF_PAL, player.facing < 0);
-  // Echte Foto-Birne von Josef
+  const pal = josefImgReady ? JOSEF_PAL_BODY : JOSEF_PAL_FULL;
+  spr(grid, px0, py0, pal, player.facing < 0);
   if (josefImgReady) {
-    const hw = 14, hh = 14;
+    const hw = 20, hh = 20;
     const hx = px0 + (12 - hw) / 2;
-    const hy = py0 - 3;
+    const hy = py0 - 8;
     if (player.facing < 0) {
       ctx.save();
       ctx.translate(hx + hw, hy);
