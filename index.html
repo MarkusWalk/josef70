@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Josef's Zeitreise – 70 Jahre in einem Sprung</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; touch-action:manipulation; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family: -apple-system, system-ui, sans-serif; }
+  #game { display:block; width:100%; height:100%; image-rendering:pixelated; image-rendering:crisp-edges; background:#7ec0ee; }
+  #hud { position:fixed; top:env(safe-area-inset-top, 8px); left:10px; color:#fff; font-size:16px; font-weight:bold; text-shadow:2px 2px 0 #000, -1px -1px 0 #000; z-index:5; pointer-events:none; }
+  #era { position:fixed; top:env(safe-area-inset-top, 8px); right:10px; color:#fff; font-size:14px; font-weight:bold; text-shadow:2px 2px 0 #000, -1px -1px 0 #000; z-index:5; pointer-events:none; max-width:60%; text-align:right; }
+  #toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff; font-size:22px; font-weight:bold; text-shadow:3px 3px 0 #000; opacity:0; transition:opacity .3s; pointer-events:none; z-index:6; text-align:center; background:rgba(0,0,0,.4); padding:8px 16px; border-radius:8px; }
+  #toast.show { opacity:1; }
+  #controls { position:fixed; bottom:env(safe-area-inset-bottom, 16px); left:0; right:0; padding:0 16px; display:flex; justify-content:space-between; align-items:flex-end; pointer-events:none; z-index:4; }
+  .left-group { display:flex; gap:12px; pointer-events:none; }
+  .btn { pointer-events:auto; background:rgba(255,255,255,0.22); color:#fff; border:3px solid rgba(255,255,255,0.55); border-radius:50%; width:72px; height:72px; font-size:32px; font-weight:bold; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+  .btn:active { background:rgba(255,255,255,0.45); transform:scale(0.92); }
+  #overlay { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.88); color:#fff; text-align:center; padding:24px; z-index:10; }
+  #overlay h1 { font-size:26px; margin-bottom:14px; color:#ffd700; line-height:1.2; }
+  #overlay h2 { font-size:20px; margin-bottom:10px; color:#ffd700; }
+  #overlay p { font-size:15px; margin-bottom:10px; max-width:420px; line-height:1.4; }
+  #overlay .small { font-size:13px; opacity:.8; }
+  #overlay button { margin-top:18px; padding:14px 30px; font-size:18px; background:#ffd700; color:#000; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
+  #overlay button:active { transform:scale(0.96); }
+  .hidden { display:none !important; }
+  .end-stats { background:rgba(255,255,255,0.08); padding:12px 18px; border-radius:8px; margin:10px 0; }
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="hud">🍺 <span id="score">0</span></div>
+<div id="era"></div>
+<div id="toast"></div>
+<div id="controls" class="hidden">
+  <div class="left-group">
+    <div class="btn" id="leftBtn">◀</div>
+    <div class="btn" id="rightBtn">▶</div>
+  </div>
+  <div class="btn" id="jumpBtn">▲</div>
+</div>
+<div id="overlay">
+  <h1>🎂 Alles Gute, Josef! 🎂</h1>
+  <p><b>Eine kleine Zeitreise durch 70 Jahre</b> — vom Buam aus Sengenthal bis zum Opa von Hannah und Linda.</p>
+  <p>Sammle Erinnerungen (🍺 🥨 🥩 ❤️), spring über Hindernisse, lauf bis zur Geburtstagstorte.</p>
+  <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. Am PC: Pfeiltasten + Leertaste.</p>
+  <button id="startBtn">Los geht's!</button>
+</div>
+
+<script>
+'use strict';
+
+// ===========================================================
+//   JOSEFS ZEITREISE  –  ein Pixel-Jump'n'Run zum 70er
+// ===========================================================
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const hudScore = document.getElementById('score');
+const hudEra = document.getElementById('era');
+const toastEl = document.getElementById('toast');
+const overlay = document.getElementById('overlay');
+const controls = document.getElementById('controls');
+
+let SCALE = 3;
+let VIEW_W = 320;
+let VIEW_H = 180;
+
+function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  const cssW = window.innerWidth;
+  const cssH = window.innerHeight;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  canvas.width = Math.floor(cssW * dpr);
+  canvas.height = Math.floor(cssH * dpr);
+  const targetH = 200;
+  SCALE = Math.max(1, Math.floor(canvas.height / targetH));
+  VIEW_W = Math.ceil(canvas.width / SCALE);
+  VIEW_H = Math.ceil(canvas.height / SCALE);
+  ctx.imageSmoothingEnabled = false;
+}
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', resize);
+resize();
+
+const GROUND_H = 28;
+const GRAVITY = 0.55;
+const JUMP_V = -9.2;
+const RUN_SPEED = 2.2;
+const WORLD_END = 6800;
+
+const ERAS = [
+  { name: "1956 · Sengenthal",          start: 0,    sky:'#9bd0f5', ground:'#7ba35a' },
+  { name: "1960er · Wirtschaftswunder", start: 600,  sky:'#a8d8f5', ground:'#7ba35a' },
+  { name: "1969 · Mondlandung",         start: 1200, sky:'#0d1538', ground:'#6a6a5a' },
+  { name: "1970er · Spedition",         start: 1700, sky:'#e9b878', ground:'#9a8458' },
+  { name: "Studentenzeit · Lederhose",  start: 2300, sky:'#b8d488', ground:'#7ba35a' },
+  { name: "1980er · Max Bögl",          start: 2900, sky:'#a4b8c4', ground:'#8a8a8a' },
+  { name: "1989 · Mauerfall",           start: 3600, sky:'#5a6088', ground:'#6e6e6e' },
+  { name: "1990er · Hochzeit & Martin", start: 4200, sky:'#bce0ee', ground:'#7ba35a' },
+  { name: "2017 · Enkelkinder",         start: 4900, sky:'#ffd0b0', ground:'#7ba35a' },
+  { name: "2026 · Dei 70er!",           start: 5800, sky:'#ffb8d8', ground:'#7ba35a' },
+];
+
+function currentEra(x) {
+  let e = ERAS[0];
+  for (const era of ERAS) { if (x >= era.start) e = era; }
+  return e;
+}
+function nextEra(x) {
+  for (let i = 0; i < ERAS.length; i++) { if (x < ERAS[i].start) return ERAS[i]; }
+  return null;
+}
+function eraBlend(x) {
+  const cur = currentEra(x);
+  const nxt = nextEra(x);
+  if (!nxt) return { era: cur, next: cur, t: 0 };
+  const dist = nxt.start - x;
+  const blendWindow = 120;
+  if (dist > blendWindow) return { era: cur, next: nxt, t: 0 };
+  return { era: cur, next: nxt, t: 1 - dist / blendWindow };
+}
+function lerpColor(a, b, t) {
+  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
+  const ar=(pa>>16)&255, ag=(pa>>8)&255, ab=pa&255;
+  const br=(pb>>16)&255, bg=(pb>>8)&255, bb=pb&255;
+  const r = Math.round(ar + (br-ar)*t);
+  const g = Math.round(ag + (bg-ag)*t);
+  const b2= Math.round(ab + (bb-ab)*t);
+  return `rgb(${r},${g},${b2})`;
+}
+
+const things = [];
+function push(o) { things.push(o); }
+
+// Era 1: Sengenthal
+push({ type:'scenery', kind:'church', x: 180, y: 0 });
+push({ type:'sign', x: 80,  text:'Sengenthal' });
+push({ type:'item', kind:'beer', x: 260, y: -14 });
+push({ type:'obstacle', kind:'stone', x: 380, w:18, h:14 });
+push({ type:'item', kind:'brezn', x: 470, y: -36 });
+push({ type:'item', kind:'beer', x: 540, y: -14 });
+
+// Era 2: Wirtschaftswunder
+push({ type:'sign', x: 640, text:'Langenthal b. Berg' });
+push({ type:'scenery', kind:'kaefer', x: 780, y: 0 });
+push({ type:'item', kind:'dmark', x: 880, y: -22 });
+push({ type:'obstacle', kind:'stone', x: 980, w:20, h:14 });
+push({ type:'item', kind:'brezn', x: 1060, y: -40 });
+push({ type:'item', kind:'leberkaes', x: 1130, y: -22 });
+
+// Era 3: Mondlandung
+push({ type:'sign', x: 1260, text:'1969 · Mondlandung' });
+push({ type:'scenery', kind:'rocket', x: 1380, y: 0 });
+push({ type:'item', kind:'star', x: 1440, y: -50 });
+push({ type:'item', kind:'star', x: 1520, y: -60 });
+push({ type:'obstacle', kind:'crater', x: 1600, w:34, h:10 });
+push({ type:'item', kind:'star', x: 1660, y: -54 });
+
+// Era 4: Spedition
+push({ type:'sign', x: 1760, text:'Spedition · Versandhaus' });
+push({ type:'scenery', kind:'truck', x: 1880, y: 0 });
+push({ type:'obstacle', kind:'parcel', x: 2000, w:22, h:20 });
+push({ type:'obstacle', kind:'parcelStack', x: 2090, w:24, h:34 });
+push({ type:'item', kind:'beer', x: 2180, y: -14 });
+push({ type:'sign', x: 2240, text:'Bratwürste Nießlbeck'});
+
+// Era 5: Studentenzeit
+push({ type:'sign', x: 2360, text:'Studentenverbindung' });
+push({ type:'scenery', kind:'muetze', x: 2440, y: 0 });
+push({ type:'item', kind:'beer', x: 2500, y: -14 });
+push({ type:'item', kind:'beer', x: 2560, y: -38 });
+push({ type:'item', kind:'beer', x: 2620, y: -14 });
+push({ type:'obstacle', kind:'stone', x: 2700, w:18, h:14 });
+push({ type:'item', kind:'brezn', x: 2780, y: -40 });
+push({ type:'npc', kind:'lurch', x: 2850 });
+
+// Era 6: Max Bögl
+push({ type:'sign', x: 2960, text:'Max Bögl' });
+push({ type:'scenery', kind:'crane', x: 3080, y: 0 });
+push({ type:'obstacle', kind:'concrete', x: 3180, w:30, h:18 });
+push({ type:'obstacle', kind:'concrete', x: 3280, w:30, h:18 });
+push({ type:'item', kind:'leberkaes', x: 3360, y: -22 });
+push({ type:'scenery', kind:'truckBoegl', x: 3450, y: 0 });
+push({ type:'item', kind:'brezn', x: 3540, y: -36 });
+
+// Era 7: Mauerfall
+push({ type:'sign', x: 3640, text:'9. November 1989' });
+push({ type:'scenery', kind:'gate', x: 3780, y: 0 });
+push({ type:'obstacle', kind:'wall', x: 3920, w:18, h:42 });
+push({ type:'item', kind:'star', x: 3990, y: -52 });
+push({ type:'item', kind:'beer', x: 4060, y: -14 });
+
+// Era 8: Familie
+push({ type:'sign', x: 4240, text:'Dorothee & Martin' });
+push({ type:'npc', kind:'dorothee', x: 4360 });
+push({ type:'item', kind:'heart', x: 4420, y: -36 });
+push({ type:'npc', kind:'martin', x: 4500 });
+push({ type:'item', kind:'heart', x: 4560, y: -36 });
+push({ type:'obstacle', kind:'stone', x: 4640, w:18, h:14 });
+push({ type:'item', kind:'leberkaes', x: 4730, y: -22 });
+push({ type:'item', kind:'brezn', x: 4800, y: -40 });
+
+// Era 9: Enkel
+push({ type:'sign', x: 4940, text:'Hannah & Linda · 2017' });
+push({ type:'npc', kind:'hannah', x: 5060 });
+push({ type:'item', kind:'heart', x: 5120, y: -36 });
+push({ type:'npc', kind:'linda', x: 5180 });
+push({ type:'item', kind:'heart', x: 5240, y: -38 });
+push({ type:'item', kind:'star', x: 5320, y: -50 });
+push({ type:'item', kind:'beer', x: 5400, y: -14 });
+push({ type:'item', kind:'brezn', x: 5480, y: -40 });
+push({ type:'item', kind:'leberkaes', x: 5560, y: -22 });
+
+// Era 10: Geburtstag
+push({ type:'sign', x: 5840, text:'Alles Gute zum 70.!' });
+push({ type:'scenery', kind:'banner', x: 5990, y: 0 });
+push({ type:'item', kind:'heart', x: 6080, y: -42 });
+push({ type:'item', kind:'star', x: 6150, y: -54 });
+push({ type:'item', kind:'heart', x: 6220, y: -42 });
+push({ type:'goal', kind:'cake', x: 6400, y: 0 });
+
+const player = {
+  x: 30, y: 0, vx: 0, vy: 0, w: 12, h: 22, onGround: true, facing: 1,
+  walkPhase: 0, hurtT: 0,
+};
+
+const input = { left:false, right:false, jump:false, jumpPressed:false };
+function bindBtn(id, key) {
+  const el = document.getElementById(id);
+  const set = v => () => { input[key] = v; if (key==='jump' && v) input.jumpPressed = true; };
+  el.addEventListener('touchstart', e=>{ e.preventDefault(); set(true)(); }, {passive:false});
+  el.addEventListener('touchend',   e=>{ e.preventDefault(); set(false)(); }, {passive:false});
+  el.addEventListener('touchcancel',e=>{ e.preventDefault(); set(false)(); }, {passive:false});
+  el.addEventListener('mousedown',  set(true));
+  el.addEventListener('mouseup',    set(false));
+  el.addEventListener('mouseleave', set(false));
+}
+bindBtn('leftBtn','left');
+bindBtn('rightBtn','right');
+bindBtn('jumpBtn','jump');
+
+window.addEventListener('keydown', e=>{
+  if (e.key==='ArrowLeft' || e.key==='a') input.left = true;
+  if (e.key==='ArrowRight' || e.key==='d') input.right = true;
+  if (e.key===' ' || e.key==='ArrowUp' || e.key==='w') { if(!input.jump) input.jumpPressed = true; input.jump = true; }
+});
+window.addEventListener('keyup', e=>{
+  if (e.key==='ArrowLeft' || e.key==='a') input.left = false;
+  if (e.key==='ArrowRight' || e.key==='d') input.right = false;
+  if (e.key===' ' || e.key==='ArrowUp' || e.key==='w') input.jump = false;
+});
+
+function px(x, y, w, h, color) { ctx.fillStyle = color; ctx.fillRect(x, y, w, h); }
+
+function spr(grid, x, y, palette, flipX=false) {
+  for (let r=0; r<grid.length; r++){
+    const row = grid[r];
+    for (let c=0; c<row.length; c++){
+      const ch = row[c];
+      if (ch===' '||ch==='.') continue;
+      const col = palette[ch];
+      if (!col) continue;
+      const dx = flipX ? (grid[0].length - 1 - c) : c;
+      ctx.fillStyle = col;
+      ctx.fillRect(x + dx, y + r, 1, 1);
+    }
+  }
+}
+
+const JOSEF_STAND = [
+  "....HHHH....",
+  "...HHHHHH...",
+  "...HHHHHH...",
+  "....SSSS....",
+  "...FKKKKF...",
+  "...FKKKKF...",
+  "....KKKK....",
+  "...WWWWWW...",
+  "..WWCWWCWW..",
+  "..WWWWWWWW..",
+  "..WCWWWWCW..",
+  "..BBBBBBBB..",
+  "..BBBBBBBB..",
+  "..BBYBBYBB..",
+  "...B....B...",
+  "...K....K...",
+  "...K....K...",
+  "...N....N...",
+  "...N....N...",
+  "..SSS..SSS..",
+];
+const JOSEF_WALK = [
+  "....HHHH....",
+  "...HHHHHH...",
+  "...HHHHHH...",
+  "....SSSS....",
+  "...FKKKKF...",
+  "...FKKKKF...",
+  "....KKKK....",
+  "...WWWWWW...",
+  "..WWCWWCWW..",
+  "..WWWWWWWW..",
+  "..WCWWWWCW..",
+  "..BBBBBBBB..",
+  "..BBBBBBBB..",
+  "..BBYBBYBB..",
+  "..B......B..",
+  "..K......K..",
+  "...K....K...",
+  "....N..N....",
+  "...N....N...",
+  ".SSS....SSS.",
+];
+const JOSEF_JUMP = [
+  "....HHHH....",
+  "...HHHHHH...",
+  "...HHHHHH...",
+  "....SSSS....",
+  "...FKKKKF...",
+  "...FKKKKF...",
+  "....KKKK....",
+  "...WWWWWW...",
+  "..WWCWWCWW..",
+  "..WWWWWWWW..",
+  "..WCWWWWCW..",
+  "..BBBBBBBB..",
+  "..BBBBBBBB..",
+  ".BBBYYYYBBB.",
+  "..B......B..",
+  "..K......K..",
+  "..N......N..",
+  ".SSS....SSS.",
+];
+const JOSEF_PAL = {
+  H:'#2d5a1a', S:'#3a2210', K:'#f4caa0', F:'#e8b888',
+  W:'#ffffff', C:'#3464a8', B:'#6a3a14', Y:'#caa050', N:'#e8d8a0',
+};
+
+function drawJosef() {
+  const grid = !player.onGround ? JOSEF_JUMP
+    : (Math.abs(player.vx) > 0.5 ? (Math.floor(player.walkPhase) % 2 === 0 ? JOSEF_WALK : JOSEF_STAND) : JOSEF_STAND);
+  const flash = player.hurtT > 0 && Math.floor(player.hurtT * 20) % 2 === 0;
+  if (flash) return;
+  spr(grid, Math.round(player.x), Math.round(player.y), JOSEF_PAL, player.facing < 0);
+}
+
+const SPR = {
+  beer: [
+    "..MMMMMM..",
+    ".MWFFFFWM.",
+    "MWGGGGGGWM",
+    "MWGGGGGGWM",
+    "MWYYYYYYWM",
+    "MWYYYYYYWM",
+    "MWYYYYYYWM",
+    "MWYYYYYYWM",
+    ".MWWWWWWM.",
+    "..MMMMMM..",
+  ],
+  brezn: [
+    "..BBB..BBB..",
+    ".BWWWBBWWWB.",
+    "BWW.BBBB.WWB",
+    "BW.BWWWWB.WB",
+    ".BBWWWWWWBB.",
+    "..BWWWWWWB..",
+    "..BWWWWWWB..",
+    "...BBBBBB...",
+  ],
+  leberkaes: [
+    "WWWWWWWWWW",
+    "WYYYYYYYWW",
+    "WLLLLLLLLW",
+    "WLLRRRRLLW",
+    "WLLLLLLLLW",
+    "WYYYYYYYWW",
+    "WWWWWWWWWW",
+  ],
+  heart: [
+    ".RR..RR.",
+    "RPPRRPPR",
+    "RPPPPPPR",
+    "RPPPPPPR",
+    ".RPPPPR.",
+    "..RPPR..",
+    "...RR...",
+  ],
+  star: [
+    "....Y....",
+    "...YYY...",
+    "YYYYYYYYY",
+    ".YYYYYYY.",
+    "..YYYYY..",
+    ".YY.Y.YY.",
+    "Y...Y...Y",
+  ],
+  dmark: [
+    "..CCCC..",
+    ".CYYYYC.",
+    "CYDMYYYC",
+    "CYDMYYYC",
+    "CYDYMYYC",
+    "CYDDMYYC",
+    ".CYYYYC.",
+    "..CCCC..",
+  ],
+};
+const ITEM_PAL = {
+  M:'#3a3a3a', W:'#f4f4f4', F:'#f8e8c0', G:'#c8a868', Y:'#e8b830',
+  B:'#7a4a14', L:'#e8c890', R:'#c83030', P:'#ff6688',
+  C:'#d4d4d4', D:'#8a6a20',
+};
+
+function drawItem(it, sx, sy) {
+  const s = SPR[it.kind];
+  if (s) spr(s, sx, sy, ITEM_PAL);
+}
+
+function drawSign(x, gy, text) {
+  px(x+5, gy-22, 2, 22, '#6a4a20');
+  const w = Math.min(86, Math.max(40, text.length * 4 + 8));
+  px(x-w/2+6, gy-34, w, 12, '#c89858');
+  px(x-w/2+6, gy-34, w, 1,  '#7a5828');
+  px(x-w/2+6, gy-23, w, 1,  '#7a5828');
+  ctx.fillStyle = '#3a2410';
+  ctx.font = 'bold 7px monospace';
+  ctx.textBaseline = 'top';
+  ctx.textAlign = 'center';
+  ctx.fillText(text, x+6, gy-32);
+}
+
+function drawChurch(x, gy) {
+  px(x, gy-50, 16, 50, '#e8e0d0');
+  px(x+2, gy-46, 12, 1, '#a89878');
+  px(x+6, gy-40, 4, 6, '#3a3a8a');
+  px(x+6, gy-26, 4, 6, '#3a3a8a');
+  px(x+1, gy-58, 14, 4, '#7a3a3a');
+  px(x+3, gy-62, 10, 4, '#7a3a3a');
+  px(x+5, gy-66, 6, 4, '#7a3a3a');
+  px(x+7, gy-72, 2, 6, '#3a3a3a');
+  px(x+6, gy-74, 4, 2, '#caa030');
+  px(x+7, gy-78, 2, 4, '#caa030');
+}
+
+function drawKaefer(x, gy) {
+  const b = '#1a4a2a';
+  px(x+4, gy-12, 30, 10, b);
+  px(x+8, gy-18, 22, 6, b);
+  px(x+10, gy-17, 8, 4, '#a0d8e8');
+  px(x+20, gy-17, 8, 4, '#a0d8e8');
+  px(x+9,  gy-2, 6, 4, '#1a1a1a');
+  px(x+23, gy-2, 6, 4, '#1a1a1a');
+  px(x+10, gy-1, 4, 2, '#888888');
+  px(x+24, gy-1, 4, 2, '#888888');
+  px(x+34, gy-10, 2, 2, '#ffd060');
+}
+
+function drawRocket(x, gy) {
+  px(x+2,  gy-60, 6, 36, '#e8e8e8');
+  px(x+0,  gy-24, 10, 6, '#e8e8e8');
+  px(x+3,  gy-66, 4, 8, '#e8e8e8');
+  px(x+4,  gy-70, 2, 4, '#c83030');
+  px(x+3,  gy-50, 4, 4, '#3464a8');
+  px(x+1,  gy-18, 8, 8, '#ffaa20');
+  px(x+2,  gy-12, 6, 6, '#ff5020');
+  px(x+3,  gy-8,  4, 4, '#ffff80');
+}
+
+function drawTruck(x, gy) {
+  px(x,    gy-18, 22, 14, '#a83030');
+  px(x+22, gy-14, 12, 10, '#a83030');
+  px(x+24, gy-12, 8, 6, '#a0d8e8');
+  px(x+2,  gy-2, 5, 3, '#1a1a1a');
+  px(x+14, gy-2, 5, 3, '#1a1a1a');
+  px(x+26, gy-2, 5, 3, '#1a1a1a');
+  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='left';
+  ctx.fillText('VERSAND', x+1, gy-15);
+}
+
+function drawMuetze(x, gy) {
+  px(x+5, gy-18, 2, 18, '#6a4a20');
+  px(x,   gy-26, 12, 8, '#3464a8');
+  px(x,   gy-22, 12, 2, '#c83030');
+  px(x,   gy-20, 12, 2, '#f4f4f4');
+  px(x+1, gy-28, 10, 4, '#1a3a78');
+}
+
+function drawCrane(x, gy) {
+  px(x+10, gy-70, 4, 70, '#c83030');
+  px(x-10, gy-66, 50, 3, '#c83030');
+  px(x-12, gy-68, 6, 8, '#a83030');
+  px(x-10, gy-63, 2, 8, '#c83030');
+  px(x-12, gy-55, 6, 4, '#3a3a3a');
+}
+
+function drawTruckBoegl(x, gy) {
+  px(x,    gy-16, 28, 12, '#f4c020');
+  px(x+28, gy-12, 10, 8, '#f4c020');
+  px(x+30, gy-10, 6, 4, '#a0d8e8');
+  px(x+3,  gy-2, 5, 3, '#1a1a1a');
+  px(x+18, gy-2, 5, 3, '#1a1a1a');
+  px(x+30, gy-2, 5, 3, '#1a1a1a');
+  ctx.fillStyle='#1a1a1a'; ctx.font='bold 6px monospace';
+  ctx.fillText('BÖGL', x+4, gy-13);
+}
+
+function drawGate(x, gy) {
+  const stoneA = '#d8c8a0', stoneB = '#b8a880';
+  px(x, gy-50, 60, 50, stoneA);
+  for (let i=0;i<4;i++) px(x+8+i*12, gy-44, 6, 38, stoneB);
+  px(x+6, gy-58, 48, 8, stoneA);
+  px(x+24, gy-66, 12, 8, '#3a3a3a');
+  px(x+22, gy-63, 16, 3, '#3a3a3a');
+}
+
+function drawBanner(x, gy) {
+  px(x, gy-60, 80, 22, '#ffd700');
+  px(x, gy-60, 80, 2, '#caa030');
+  px(x, gy-40, 80, 2, '#caa030');
+  ctx.fillStyle='#a83030'; ctx.font='bold 16px monospace'; ctx.textAlign='center';
+  ctx.fillText('JOSEF · 70', x+40, gy-58);
+  px(x-4, gy-66, 88, 1, '#3a3a3a');
+}
+
+function drawTinyPerson(x, gy, palOverride) {
+  const pal = Object.assign({}, JOSEF_PAL, palOverride||{});
+  const grid = [
+    "..HHHH..",
+    ".HKKKKH.",
+    ".HKKKKH.",
+    "..KKKK..",
+    ".WWWWWW.",
+    ".WWWWWW.",
+    ".BBBBBB.",
+    ".BBBBBB.",
+    "..B..B..",
+    "..K..K..",
+    "..N..N..",
+    "..S..S..",
+  ];
+  spr(grid, x, gy-12, pal);
+}
+
+function drawDorothee(x, gy) {
+  const pal = { H:'#a05030', K:'#f4caa0', W:'#f4f4f4', B:'#a83060', N:'#e8d8a0', S:'#5a3a20' };
+  drawTinyPerson(x, gy, pal);
+  px(x+2, gy-7, 4, 2, '#ffffff');
+  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
+  ctx.fillText('Dorothee', x+4, gy-18);
+}
+function drawMartin(x, gy) {
+  const pal = { H:'#caa050', K:'#f4caa0', W:'#3464a8', B:'#3a3a3a', N:'#e8d8a0', S:'#3a2410' };
+  drawTinyPerson(x, gy, pal);
+  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
+  ctx.fillText('Martin', x+4, gy-18);
+}
+function drawHannah(x, gy) {
+  const pal = { H:'#caa030', K:'#f4caa0', W:'#e88aa8', B:'#a83060', N:'#e8d8a0', S:'#caa030' };
+  drawTinyPerson(x, gy+2, pal);
+  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
+  ctx.fillText('Hannah', x+4, gy-16);
+}
+function drawLinda(x, gy) {
+  const pal = { H:'#7a4a20', K:'#f4caa0', W:'#a0e8a0', B:'#3464a8', N:'#e8d8a0', S:'#5a3a20' };
+  drawTinyPerson(x, gy+2, pal);
+  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
+  ctx.fillText('Linda', x+4, gy-16);
+}
+function drawLurch(x, gy) {
+  px(x, gy-4, 22, 4, '#caa030');
+  px(x+2, gy-6, 18, 2, '#caa030');
+  px(x+20, gy-3, 4, 2, '#caa030');
+  px(x+3, gy-5, 1, 1, '#000');
+  px(x+5, gy-5, 1, 1, '#000');
+  px(x+8, gy-5, 2, 1, '#7a3a10');
+  px(x+14, gy-5, 2, 1, '#7a3a10');
+}
+
+function drawObstacle(o, gy) {
+  if (o.kind === 'stone') {
+    px(o.x, gy-o.h, o.w, o.h, '#888');
+    px(o.x, gy-o.h, o.w, 2, '#aaa');
+    px(o.x, gy-2, o.w, 2, '#666');
+  } else if (o.kind === 'parcel') {
+    px(o.x, gy-o.h, o.w, o.h, '#b88858');
+    px(o.x+2, gy-o.h+2, o.w-4, 2, '#d8a878');
+    px(o.x, gy-o.h/2-1, o.w, 2, '#e8d8a0');
+    px(o.x+o.w/2-1, gy-o.h, 2, o.h, '#e8d8a0');
+  } else if (o.kind === 'parcelStack') {
+    px(o.x, gy-12, o.w, 12, '#b88858');
+    px(o.x+1, gy-24, o.w-2, 12, '#d89868');
+    px(o.x+2, gy-o.h, o.w-4, o.h-24, '#b88858');
+  } else if (o.kind === 'concrete') {
+    px(o.x, gy-o.h, o.w, o.h, '#a0a0a0');
+    px(o.x, gy-o.h, o.w, 2, '#c0c0c0');
+    px(o.x+2, gy-o.h+4, o.w-4, 2, '#888');
+    px(o.x+2, gy-o.h+8, o.w-4, 2, '#888');
+  } else if (o.kind === 'crater') {
+    px(o.x, gy-2, o.w, 2, '#3a3a3a');
+    px(o.x+2, gy-4, o.w-4, 2, '#5a5a5a');
+  } else if (o.kind === 'wall') {
+    for (let i=0;i<o.h;i+=6) {
+      px(o.x, gy-o.h+i, o.w, 5, i%12===0 ? '#d0d0d0':'#b8b8b8');
+    }
+    px(o.x+2, gy-o.h+8, 3, 3, '#c83030');
+    px(o.x+6, gy-o.h+12, 3, 3, '#3464a8');
+    px(o.x+3, gy-o.h+18, 4, 2, '#caa030');
+  }
+}
+
+function drawCake(x, gy) {
+  px(x-4,  gy-2,  40, 2,  '#caa030');
+  px(x,    gy-14, 32, 12, '#f4e8c8');
+  px(x+2,  gy-20, 28, 6,  '#e8a8c8');
+  px(x+4,  gy-30, 24, 10, '#f4e8c8');
+  px(x+6,  gy-34, 20, 4,  '#e8a8c8');
+  for (let i=0;i<7;i++){
+    const cx = x+6 + i*3;
+    px(cx, gy-40, 1, 6, '#3464a8');
+    px(cx, gy-42, 1, 2, '#ffaa20');
+    px(cx-1, gy-41, 3, 1, '#ffe080');
+  }
+  ctx.fillStyle='#a83030'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+  ctx.fillText('70', x+16, gy-7);
+}
+
+const clouds = [];
+for (let i=0;i<24;i++) clouds.push({ x: Math.random()*WORLD_END, y: 14 + Math.random()*40, w: 16+Math.random()*22 });
+const stars = [];
+for (let i=0;i<60;i++) stars.push({ x: 1200 + Math.random()*700, y: 10 + Math.random()*80 });
+
+function drawCloud(c, camX) {
+  const x = c.x - camX*0.4;
+  if (x + c.w < -10 || x > VIEW_W+10) return;
+  px(x, c.y, c.w, 4, '#ffffff');
+  px(x+2, c.y-2, c.w-4, 2, '#ffffff');
+  px(x+4, c.y+4, c.w-8, 2, '#e8e8f0');
+}
+function drawMountains(camX) {
+  const baseY = VIEW_H - GROUND_H;
+  ctx.fillStyle = '#6a7a98';
+  for (let i=0;i<10;i++){
+    const mx = (i*180 - (camX*0.2 % 180)) | 0;
+    const h = 40 + (i%3)*8;
+    ctx.beginPath();
+    ctx.moveTo(mx, baseY);
+    ctx.lineTo(mx+40, baseY - h);
+    ctx.lineTo(mx+90, baseY);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.fillStyle = '#3a5a3a';
+  for (let i=0;i<12;i++){
+    const mx = (i*120 - (camX*0.4 % 120)) | 0;
+    const h = 22 + (i%2)*8;
+    ctx.beginPath();
+    ctx.moveTo(mx, baseY);
+    ctx.lineTo(mx+30, baseY - h);
+    ctx.lineTo(mx+70, baseY);
+    ctx.closePath();
+    ctx.fill();
+  }
+}
+
+let camX = 0;
+let score = 0;
+let prevTime = 0;
+let running = false;
+let finished = false;
+
+function showToast(msg, dur=1400) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>toastEl.classList.remove('show'), dur);
+}
+
+let lastEraName = '';
+function updateEraLabel() {
+  const e = currentEra(player.x).name;
+  if (e !== lastEraName) {
+    lastEraName = e;
+    hudEra.textContent = e;
+    showToast(e, 1600);
+  }
+}
+
+function update(dt) {
+  let ax = 0;
+  if (input.left) ax -= 1;
+  if (input.right) ax += 1;
+  player.vx = ax * RUN_SPEED;
+  if (ax > 0) player.facing = 1;
+  else if (ax < 0) player.facing = -1;
+
+  if (player.onGround && input.jumpPressed) {
+    player.vy = JUMP_V;
+    player.onGround = false;
+  }
+  input.jumpPressed = false;
+
+  if (!input.jump && player.vy < -3) player.vy = -3;
+
+  player.vy += GRAVITY;
+  if (player.vy > 12) player.vy = 12;
+
+  player.x += player.vx;
+  player.y += player.vy;
+
+  if (Math.abs(player.vx) > 0.1) player.walkPhase += Math.abs(player.vx) * 0.18;
+
+  if (player.x < 0) player.x = 0;
+  if (player.x > WORLD_END - player.w) player.x = WORLD_END - player.w;
+
+  const gy = VIEW_H - GROUND_H;
+  if (player.y + player.h >= gy) {
+    player.y = gy - player.h;
+    player.vy = 0;
+    player.onGround = true;
+  } else {
+    player.onGround = false;
+  }
+
+  if (player.hurtT > 0) player.hurtT -= dt;
+  for (const o of things) {
+    if (o.type !== 'obstacle') continue;
+    const oy = gy - o.h;
+    if (player.x + player.w > o.x && player.x < o.x + o.w &&
+        player.y + player.h > oy && player.y < oy + o.h) {
+      const playerBottomPrev = (player.y + player.h) - player.vy;
+      if (playerBottomPrev <= oy + 1 && player.vy >= 0) {
+        player.y = oy - player.h;
+        player.vy = 0;
+        player.onGround = true;
+      } else {
+        if (player.vx > 0) player.x = o.x - player.w - 0.1;
+        else if (player.vx < 0) player.x = o.x + o.w + 0.1;
+        if (player.hurtT <= 0) {
+          player.hurtT = 0.5;
+          player.vy = -4;
+          player.onGround = false;
+          showToast('Hoppla! 😅', 700);
+        }
+      }
+    }
+  }
+
+  for (const it of things) {
+    if (it.collected) continue;
+    if (it.type === 'item' || it.type === 'npc') {
+      const iy = gy + (it.y || -8);
+      const iw = it.type==='npc' ? 10 : 10;
+      const ih = it.type==='npc' ? 14 : 10;
+      const ix = it.x;
+      if (player.x + player.w > ix && player.x < ix + iw &&
+          player.y + player.h > iy && player.y < iy + ih) {
+        it.collected = true;
+        if (it.type === 'item') {
+          score++;
+          hudScore.textContent = score;
+          const labels = { beer:'+1 🍺 Bier!', brezn:'+1 🥨 Brezn!', leberkaes:'+1 🥩 Leberkäs!',
+                           heart:'+1 ❤️', star:'+1 ⭐', dmark:'+1 💰 D-Mark!' };
+          showToast(labels[it.kind] || '+1', 900);
+        } else if (it.type === 'npc') {
+          const greets = {
+            dorothee:'Servus Dorothee! ❤️',
+            martin:  'Hallo Martin! 👋',
+            hannah:  'Hi Opa! – Hannah 🌸',
+            linda:   'Hi Opa! – Linda 🌸',
+            lurch:   'Der Lurch! 🦎',
+          };
+          showToast(greets[it.kind] || 'Hallo!', 1400);
+        }
+      }
+    }
+  }
+
+  for (const g of things) {
+    if (g.type === 'goal' && !finished) {
+      const gx = g.x;
+      if (player.x + player.w > gx && player.x < gx + 36) {
+        finished = true;
+        running = false;
+        showEnd();
+      }
+    }
+  }
+
+  const targetCam = player.x - VIEW_W / 3;
+  camX += (targetCam - camX) * 0.18;
+  if (camX < 0) camX = 0;
+  const maxCam = WORLD_END - VIEW_W;
+  if (camX > maxCam) camX = maxCam;
+
+  updateEraLabel();
+}
+
+function render() {
+  ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+
+  const blend = eraBlend(player.x);
+  const sky = lerpColor(blend.era.sky, blend.next.sky, blend.t);
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, VIEW_W, VIEW_H);
+
+  if (currentEra(player.x).name.includes('Mondlandung')) {
+    for (const s of stars) {
+      const sx = s.x - camX;
+      if (sx > -2 && sx < VIEW_W) px(sx, s.y, 1, 1, '#ffffff');
+    }
+    px(VIEW_W - 50, 18, 18, 18, '#e8e8d0');
+    px(VIEW_W - 46, 20, 4, 4, '#c8c8b0');
+    px(VIEW_W - 38, 26, 6, 4, '#c8c8b0');
+  }
+
+  for (const c of clouds) drawCloud(c, camX);
+  drawMountains(camX);
+
+  const gy = VIEW_H - GROUND_H;
+  const ground = lerpColor(blend.era.ground, blend.next.ground, blend.t);
+  ctx.fillStyle = ground;
+  ctx.fillRect(0, gy, VIEW_W, GROUND_H);
+  ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  ctx.fillRect(0, gy, VIEW_W, 2);
+
+  ctx.save();
+  ctx.translate(-camX, 0);
+  for (const t of things) {
+    const sx = t.x;
+    if (sx - camX < -120 || sx - camX > VIEW_W + 120) continue;
+    if (t.type === 'scenery') {
+      switch (t.kind) {
+        case 'church': drawChurch(sx, gy); break;
+        case 'kaefer': drawKaefer(sx, gy); break;
+        case 'rocket': drawRocket(sx, gy); break;
+        case 'truck':  drawTruck(sx, gy); break;
+        case 'muetze': drawMuetze(sx, gy); break;
+        case 'crane':  drawCrane(sx, gy); break;
+        case 'truckBoegl': drawTruckBoegl(sx, gy); break;
+        case 'gate':   drawGate(sx, gy); break;
+        case 'banner': drawBanner(sx, gy); break;
+      }
+    } else if (t.type === 'sign') {
+      drawSign(sx, gy, t.text);
+    } else if (t.type === 'obstacle') {
+      drawObstacle(t, gy);
+    } else if (t.type === 'item' && !t.collected) {
+      drawItem(t, sx, gy + (t.y || -8));
+    } else if (t.type === 'npc' && !t.collected) {
+      switch (t.kind) {
+        case 'dorothee': drawDorothee(sx, gy); break;
+        case 'martin':   drawMartin(sx, gy); break;
+        case 'hannah':   drawHannah(sx, gy); break;
+        case 'linda':    drawLinda(sx, gy); break;
+        case 'lurch':    drawLurch(sx, gy); break;
+      }
+    } else if (t.type === 'goal') {
+      drawCake(sx, gy);
+    }
+  }
+  drawJosef();
+  ctx.restore();
+
+  ctx.setTransform(1,0,0,1,0,0);
+}
+
+function loop(t) {
+  if (!prevTime) prevTime = t;
+  const dt = Math.min(0.05, (t - prevTime) / 1000);
+  prevTime = t;
+  if (running) update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function showEnd() {
+  overlay.classList.remove('hidden');
+  controls.classList.add('hidden');
+  const totalItems = things.filter(t => t.type==='item').length;
+  const collectedItems = things.filter(t => t.type==='item' && t.collected).length;
+  const npcs = things.filter(t => t.type==='npc' && t.collected).map(t=>({
+    dorothee:'Dorothee', martin:'Martin', hannah:'Hannah', linda:'Linda', lurch:'der Lurch'
+  }[t.kind] || t.kind));
+  let extras = '';
+  if (npcs.length) extras = `<p class="small">Begegnet: ${npcs.join(', ')}</p>`;
+  overlay.innerHTML = `
+    <h1>🎂 Herzlichen Glückwunsch zum 70., Josef! 🎂</h1>
+    <p>Von Sengenthal über Max Bögl bis zu Hannah und Linda – was für eine Reise.</p>
+    <div class="end-stats">
+      <h2>Erinnerungen: ${collectedItems} / ${totalItems}</h2>
+    </div>
+    ${extras}
+    <p>Auf die nächsten Jahrzehnte – mit Lederhose, Schäufele und einer kühlen Maß. 🍺</p>
+    <button id="restartBtn">Nochmal!</button>
+  `;
+  document.getElementById('restartBtn').addEventListener('click', restart);
+}
+
+function restart() {
+  for (const t of things) t.collected = false;
+  player.x = 30; player.y = 0; player.vx = 0; player.vy = 0; player.onGround = true;
+  camX = 0; score = 0; finished = false; lastEraName = '';
+  hudScore.textContent = 0;
+  hudEra.textContent = '';
+  overlay.innerHTML = `
+    <h1>🎂 Alles Gute, Josef! 🎂</h1>
+    <p><b>Eine kleine Zeitreise durch 70 Jahre</b> — vom Buam aus Sengenthal bis zum Opa von Hannah und Linda.</p>
+    <p>Sammle Erinnerungen, spring über Hindernisse, lauf bis zur Geburtstagstorte.</p>
+    <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. Am PC: Pfeiltasten + Leertaste.</p>
+    <button id="startBtn">Los geht's!</button>
+  `;
+  document.getElementById('startBtn').addEventListener('click', start);
+  overlay.classList.remove('hidden');
+}
+
+function start() {
+  overlay.classList.add('hidden');
+  controls.classList.remove('hidden');
+  running = true;
+}
+
+document.getElementById('startBtn').addEventListener('click', start);
+</script>
+</body>
+</html>
