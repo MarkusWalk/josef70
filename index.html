@@ -3,33 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Josef's Zeitreise – 70 Jahre in einem Sprung</title>
+<title>Josefs Fitness-Test – Bist du fit für die 70?</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; touch-action:manipulation; }
   html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family: -apple-system, system-ui, sans-serif; }
   #game { display:block; width:100%; height:100%; image-rendering:pixelated; image-rendering:crisp-edges; background:#7ec0ee; }
   #hud { position:fixed; top:env(safe-area-inset-top, 8px); left:10px; color:#fff; font-size:16px; font-weight:bold; text-shadow:2px 2px 0 #000, -1px -1px 0 #000; z-index:5; pointer-events:none; }
   #era { position:fixed; top:env(safe-area-inset-top, 8px); right:10px; color:#fff; font-size:14px; font-weight:bold; text-shadow:2px 2px 0 #000, -1px -1px 0 #000; z-index:5; pointer-events:none; max-width:60%; text-align:right; }
-  #toast { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); color:#fff; font-size:22px; font-weight:bold; text-shadow:3px 3px 0 #000; opacity:0; transition:opacity .3s; pointer-events:none; z-index:6; text-align:center; background:rgba(0,0,0,.4); padding:8px 16px; border-radius:8px; }
+  #toast { position:fixed; top:42%; left:50%; transform:translate(-50%,-50%); color:#fff; font-size:22px; font-weight:bold; text-shadow:3px 3px 0 #000; opacity:0; transition:opacity .3s; pointer-events:none; z-index:6; text-align:center; background:rgba(0,0,0,.5); padding:8px 16px; border-radius:8px; }
   #toast.show { opacity:1; }
   #controls { position:fixed; bottom:env(safe-area-inset-bottom, 16px); left:0; right:0; padding:0 16px; display:flex; justify-content:space-between; align-items:flex-end; pointer-events:none; z-index:4; }
   .left-group { display:flex; gap:12px; pointer-events:none; }
   .btn { pointer-events:auto; background:rgba(255,255,255,0.22); color:#fff; border:3px solid rgba(255,255,255,0.55); border-radius:50%; width:72px; height:72px; font-size:32px; font-weight:bold; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
   .btn:active { background:rgba(255,255,255,0.45); transform:scale(0.92); }
-  #overlay { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.88); color:#fff; text-align:center; padding:24px; z-index:10; }
-  #overlay h1 { font-size:26px; margin-bottom:14px; color:#ffd700; line-height:1.2; }
+  #overlay { position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.9); color:#fff; text-align:center; padding:24px; z-index:10; overflow-y:auto; }
+  #overlay h1 { font-size:24px; margin-bottom:12px; color:#ffd700; line-height:1.2; }
   #overlay h2 { font-size:20px; margin-bottom:10px; color:#ffd700; }
-  #overlay p { font-size:15px; margin-bottom:10px; max-width:420px; line-height:1.4; }
+  #overlay p { font-size:15px; margin-bottom:10px; max-width:440px; line-height:1.4; }
   #overlay .small { font-size:13px; opacity:.8; }
   #overlay button { margin-top:18px; padding:14px 30px; font-size:18px; background:#ffd700; color:#000; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
   #overlay button:active { transform:scale(0.96); }
   .hidden { display:none !important; }
-  .end-stats { background:rgba(255,255,255,0.08); padding:12px 18px; border-radius:8px; margin:10px 0; }
+  .stats { background:rgba(255,255,255,0.08); padding:14px 20px; border-radius:8px; margin:12px 0; max-width:440px; }
+  .verdict { font-size:22px; color:#ffd700; font-weight:bold; margin:8px 0; }
 </style>
 </head>
 <body>
 <canvas id="game"></canvas>
-<div id="hud">🍺 <span id="score">0</span></div>
+<div id="hud">⭐ <span id="score">0</span></div>
 <div id="era"></div>
 <div id="toast"></div>
 <div id="controls" class="hidden">
@@ -40,19 +41,15 @@
   <div class="btn" id="jumpBtn">▲</div>
 </div>
 <div id="overlay">
-  <h1>🎂 Alles Gute, Josef! 🎂</h1>
-  <p><b>Eine kleine Zeitreise durch 70 Jahre</b> — vom Buam aus Sengenthal bis zum Opa von Hannah und Linda.</p>
-  <p>Sammle Erinnerungen (🍺 🥨 🥩 ❤️), spring über Hindernisse, lauf bis zur Geburtstagstorte.</p>
-  <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. Am PC: Pfeiltasten + Leertaste.</p>
-  <button id="startBtn">Los geht's!</button>
+  <h1>🏃‍♂️ Josefs großer Fitness-Test 🏃‍♂️</h1>
+  <p><b>Morgen wirst du 70.</b> Aber bist du noch fit genug dafür?</p>
+  <p>Lauf durch dein Leben – von '56 bis morgen – und beweis dass du's noch drauf hast. Wir messen Sterne ⭐, Stolperer 🤕 und Zeit ⏱️.</p>
+  <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. PC: Pfeiltasten + Leertaste.</p>
+  <button id="startBtn">Auf geht's, alter Mann! 💪</button>
 </div>
 
 <script>
 'use strict';
-
-// ===========================================================
-//   JOSEFS ZEITREISE  –  ein Pixel-Jump'n'Run zum 70er
-// ===========================================================
 
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext('2d');
@@ -62,20 +59,15 @@ const toastEl = document.getElementById('toast');
 const overlay = document.getElementById('overlay');
 const controls = document.getElementById('controls');
 
-let SCALE = 3;
-let VIEW_W = 320;
-let VIEW_H = 180;
-
+let SCALE = 3, VIEW_W = 320, VIEW_H = 180;
 function resize() {
   const dpr = window.devicePixelRatio || 1;
-  const cssW = window.innerWidth;
-  const cssH = window.innerHeight;
+  const cssW = window.innerWidth, cssH = window.innerHeight;
   canvas.style.width = cssW + 'px';
   canvas.style.height = cssH + 'px';
   canvas.width = Math.floor(cssW * dpr);
   canvas.height = Math.floor(cssH * dpr);
-  const targetH = 200;
-  SCALE = Math.max(1, Math.floor(canvas.height / targetH));
+  SCALE = Math.max(1, Math.floor(canvas.height / 200));
   VIEW_W = Math.ceil(canvas.width / SCALE);
   VIEW_H = Math.ceil(canvas.height / SCALE);
   ctx.imageSmoothingEnabled = false;
@@ -87,20 +79,25 @@ resize();
 const GROUND_H = 28;
 const GRAVITY = 0.55;
 const JUMP_V = -9.2;
-const RUN_SPEED = 2.2;
-const WORLD_END = 6800;
+const RUN_SPEED = 1.55;
+const WORLD_END = 9000;
 
 const ERAS = [
-  { name: "1956 · Sengenthal",          start: 0,    sky:'#9bd0f5', ground:'#7ba35a' },
-  { name: "1960er · Wirtschaftswunder", start: 600,  sky:'#a8d8f5', ground:'#7ba35a' },
-  { name: "1969 · Mondlandung",         start: 1200, sky:'#0d1538', ground:'#6a6a5a' },
-  { name: "1970er · Spedition",         start: 1700, sky:'#e9b878', ground:'#9a8458' },
-  { name: "Studentenzeit · Lederhose",  start: 2300, sky:'#b8d488', ground:'#7ba35a' },
-  { name: "1980er · Max Bögl",          start: 2900, sky:'#a4b8c4', ground:'#8a8a8a' },
-  { name: "1989 · Mauerfall",           start: 3600, sky:'#5a6088', ground:'#6e6e6e' },
-  { name: "1990er · Hochzeit & Martin", start: 4200, sky:'#bce0ee', ground:'#7ba35a' },
-  { name: "2017 · Enkelkinder",         start: 4900, sky:'#ffd0b0', ground:'#7ba35a' },
-  { name: "2026 · Dei 70er!",           start: 5800, sky:'#ffb8d8', ground:'#7ba35a' },
+  { name: "1956 · Wirtschaftswunder",   start: 0,    sky:'#9bd0f5', ground:'#7ba35a' },
+  { name: "1957 · Sputnik",             start: 600,  sky:'#0d1538', ground:'#6a6a5a' },
+  { name: "1961 · Mauerbau",            start: 1200, sky:'#8a9aae', ground:'#7a7a7a' },
+  { name: "1963 · Kennedy in Berlin",   start: 1800, sky:'#a0b8d0', ground:'#7ba35a' },
+  { name: "1966 · Beatlemania",         start: 2400, sky:'#f4c8a0', ground:'#7ba35a' },
+  { name: "1969 · Mondlandung",         start: 3000, sky:'#0d1538', ground:'#6a6a5a' },
+  { name: "1972 · Olympia München",     start: 3600, sky:'#88c8f0', ground:'#7ba35a' },
+  { name: "1973 · Ölkrise",             start: 4200, sky:'#e8b878', ground:'#9a8458' },
+  { name: "1977 · Star Wars",           start: 4800, sky:'#1a1040', ground:'#3a3a4a' },
+  { name: "1983 · 99 Luftballons",      start: 5400, sky:'#ffaab8', ground:'#7ba35a' },
+  { name: "1989 · Mauerfall!",          start: 6000, sky:'#5a6088', ground:'#6e6e6e' },
+  { name: "2000 · Millennium",          start: 6700, sky:'#1a1a4a', ground:'#7ba35a' },
+  { name: "2010 · Smartphone-Zeit",     start: 7300, sky:'#bce0ee', ground:'#7ba35a' },
+  { name: "2020er · Sofa & Streaming",  start: 7900, sky:'#d0c0e8', ground:'#7ba35a' },
+  { name: "Morgen · Josefs 70er!",      start: 8500, sky:'#ffb8d8', ground:'#7ba35a' },
 ];
 
 function currentEra(x) {
@@ -113,113 +110,143 @@ function nextEra(x) {
   return null;
 }
 function eraBlend(x) {
-  const cur = currentEra(x);
-  const nxt = nextEra(x);
+  const cur = currentEra(x), nxt = nextEra(x);
   if (!nxt) return { era: cur, next: cur, t: 0 };
   const dist = nxt.start - x;
-  const blendWindow = 120;
-  if (dist > blendWindow) return { era: cur, next: nxt, t: 0 };
-  return { era: cur, next: nxt, t: 1 - dist / blendWindow };
+  if (dist > 120) return { era: cur, next: nxt, t: 0 };
+  return { era: cur, next: nxt, t: 1 - dist / 120 };
 }
 function lerpColor(a, b, t) {
-  const pa = parseInt(a.slice(1), 16), pb = parseInt(b.slice(1), 16);
-  const ar=(pa>>16)&255, ag=(pa>>8)&255, ab=pa&255;
-  const br=(pb>>16)&255, bg=(pb>>8)&255, bb=pb&255;
-  const r = Math.round(ar + (br-ar)*t);
-  const g = Math.round(ag + (bg-ag)*t);
-  const b2= Math.round(ab + (bb-ab)*t);
-  return `rgb(${r},${g},${b2})`;
+  const parse = c => c.startsWith('#')
+    ? [parseInt(c.slice(1,3),16), parseInt(c.slice(3,5),16), parseInt(c.slice(5,7),16)]
+    : [0,0,0];
+  const [ar,ag,ab] = parse(a), [br,bg,bb] = parse(b);
+  return `rgb(${Math.round(ar+(br-ar)*t)},${Math.round(ag+(bg-ag)*t)},${Math.round(ab+(bb-ab)*t)})`;
 }
 
 const things = [];
-function push(o) { things.push(o); }
+const push = o => things.push(o);
 
-// Era 1: Sengenthal
-push({ type:'scenery', kind:'church', x: 180, y: 0 });
-push({ type:'sign', x: 80,  text:'Sengenthal' });
-push({ type:'item', kind:'beer', x: 260, y: -14 });
-push({ type:'obstacle', kind:'stone', x: 380, w:18, h:14 });
-push({ type:'item', kind:'brezn', x: 470, y: -36 });
-push({ type:'item', kind:'beer', x: 540, y: -14 });
+// === 1956 Wirtschaftswunder ===
+push({ type:'sign', x: 80,  text:'1956 · Servus Welt!' });
+push({ type:'scenery', kind:'church', x: 200, y: 0 });
+push({ type:'item', kind:'star', x: 280, y: -32 });
+push({ type:'scenery', kind:'kaefer', x: 360, y: 0 });
+push({ type:'obstacle', kind:'stone', x: 470, w:18, h:14 });
+push({ type:'item', kind:'dmark', x: 540, y: -22 });
 
-// Era 2: Wirtschaftswunder
-push({ type:'sign', x: 640, text:'Langenthal b. Berg' });
-push({ type:'scenery', kind:'kaefer', x: 780, y: 0 });
-push({ type:'item', kind:'dmark', x: 880, y: -22 });
-push({ type:'obstacle', kind:'stone', x: 980, w:20, h:14 });
-push({ type:'item', kind:'brezn', x: 1060, y: -40 });
-push({ type:'item', kind:'leberkaes', x: 1130, y: -22 });
+// === 1957 Sputnik ===
+push({ type:'sign', x: 670, text:'1957 · Sputnik piept' });
+push({ type:'scenery', kind:'sputnik', x: 800, y: -90 });
+push({ type:'item', kind:'star', x: 870, y: -52 });
+push({ type:'obstacle', kind:'stone', x: 940, w:18, h:14 });
+push({ type:'item', kind:'star', x: 1020, y: -40 });
+push({ type:'item', kind:'dmark', x: 1100, y: -22 });
 
-// Era 3: Mondlandung
-push({ type:'sign', x: 1260, text:'1969 · Mondlandung' });
-push({ type:'scenery', kind:'rocket', x: 1380, y: 0 });
-push({ type:'item', kind:'star', x: 1440, y: -50 });
-push({ type:'item', kind:'star', x: 1520, y: -60 });
-push({ type:'obstacle', kind:'crater', x: 1600, w:34, h:10 });
-push({ type:'item', kind:'star', x: 1660, y: -54 });
+// === 1961 Mauerbau ===
+push({ type:'sign', x: 1270, text:'1961 · Mauerbau' });
+push({ type:'scenery', kind:'mauerbau', x: 1390, y: 0 });
+push({ type:'obstacle', kind:'wallLow', x: 1500, w:18, h:30 });
+push({ type:'item', kind:'star', x: 1570, y: -50 });
+push({ type:'obstacle', kind:'wallLow', x: 1650, w:18, h:30 });
+push({ type:'item', kind:'star', x: 1740, y: -36 });
 
-// Era 4: Spedition
-push({ type:'sign', x: 1760, text:'Spedition · Versandhaus' });
-push({ type:'scenery', kind:'truck', x: 1880, y: 0 });
-push({ type:'obstacle', kind:'parcel', x: 2000, w:22, h:20 });
-push({ type:'obstacle', kind:'parcelStack', x: 2090, w:24, h:34 });
-push({ type:'item', kind:'beer', x: 2180, y: -14 });
-push({ type:'sign', x: 2240, text:'Bratwürste Nießlbeck'});
+// === 1963 Kennedy ===
+push({ type:'sign', x: 1860, text:'Ich bin ein Berliner' });
+push({ type:'scenery', kind:'kennedy', x: 1980, y: 0 });
+push({ type:'item', kind:'star', x: 2080, y: -42 });
+push({ type:'scenery', kind:'krapfen', x: 2160, y: -30 });
+push({ type:'obstacle', kind:'stone', x: 2230, w:18, h:14 });
+push({ type:'item', kind:'star', x: 2310, y: -40 });
 
-// Era 5: Studentenzeit
-push({ type:'sign', x: 2360, text:'Studentenverbindung' });
-push({ type:'scenery', kind:'muetze', x: 2440, y: 0 });
-push({ type:'item', kind:'beer', x: 2500, y: -14 });
-push({ type:'item', kind:'beer', x: 2560, y: -38 });
-push({ type:'item', kind:'beer', x: 2620, y: -14 });
-push({ type:'obstacle', kind:'stone', x: 2700, w:18, h:14 });
-push({ type:'item', kind:'brezn', x: 2780, y: -40 });
-push({ type:'npc', kind:'lurch', x: 2850 });
+// === 1966 Beatles ===
+push({ type:'sign', x: 2460, text:'Yeah Yeah Yeah' });
+push({ type:'scenery', kind:'beatles', x: 2580, y: 0 });
+push({ type:'item', kind:'vinyl', x: 2680, y: -42 });
+push({ type:'item', kind:'vinyl', x: 2750, y: -22 });
+push({ type:'obstacle', kind:'stone', x: 2830, w:18, h:14 });
+push({ type:'item', kind:'star', x: 2910, y: -40 });
 
-// Era 6: Max Bögl
-push({ type:'sign', x: 2960, text:'Max Bögl' });
-push({ type:'scenery', kind:'crane', x: 3080, y: 0 });
-push({ type:'obstacle', kind:'concrete', x: 3180, w:30, h:18 });
-push({ type:'obstacle', kind:'concrete', x: 3280, w:30, h:18 });
-push({ type:'item', kind:'leberkaes', x: 3360, y: -22 });
-push({ type:'scenery', kind:'truckBoegl', x: 3450, y: 0 });
-push({ type:'item', kind:'brezn', x: 3540, y: -36 });
+// === 1969 Mondlandung ===
+push({ type:'sign', x: 3060, text:'1969 · Apollo 11' });
+push({ type:'scenery', kind:'rocket', x: 3180, y: 0 });
+push({ type:'item', kind:'star', x: 3260, y: -50 });
+push({ type:'obstacle', kind:'crater', x: 3340, w:34, h:10 });
+push({ type:'scenery', kind:'astronaut', x: 3420, y: 0 });
+push({ type:'item', kind:'star', x: 3500, y: -56 });
 
-// Era 7: Mauerfall
-push({ type:'sign', x: 3640, text:'9. November 1989' });
-push({ type:'scenery', kind:'gate', x: 3780, y: 0 });
-push({ type:'obstacle', kind:'wall', x: 3920, w:18, h:42 });
-push({ type:'item', kind:'star', x: 3990, y: -52 });
-push({ type:'item', kind:'beer', x: 4060, y: -14 });
+// === 1972 Olympia ===
+push({ type:'sign', x: 3660, text:'Olympia · Waldi!' });
+push({ type:'scenery', kind:'rings', x: 3780, y: 0 });
+push({ type:'scenery', kind:'waldi', x: 3890, y: 0 });
+push({ type:'item', kind:'star', x: 3970, y: -38 });
+push({ type:'obstacle', kind:'stone', x: 4050, w:18, h:14 });
+push({ type:'item', kind:'star', x: 4130, y: -50 });
 
-// Era 8: Familie
-push({ type:'sign', x: 4240, text:'Dorothee & Martin' });
-push({ type:'npc', kind:'dorothee', x: 4360 });
-push({ type:'item', kind:'heart', x: 4420, y: -36 });
-push({ type:'npc', kind:'martin', x: 4500 });
-push({ type:'item', kind:'heart', x: 4560, y: -36 });
-push({ type:'obstacle', kind:'stone', x: 4640, w:18, h:14 });
-push({ type:'item', kind:'leberkaes', x: 4730, y: -22 });
-push({ type:'item', kind:'brezn', x: 4800, y: -40 });
+// === 1973 Ölkrise ===
+push({ type:'sign', x: 4260, text:'Autofreier Sonntag' });
+push({ type:'scenery', kind:'horseRider', x: 4380, y: 0 });
+push({ type:'scenery', kind:'emptyAutobahn', x: 4490, y: 0 });
+push({ type:'item', kind:'dmark', x: 4580, y: -22 });
+push({ type:'obstacle', kind:'stone', x: 4660, w:18, h:14 });
+push({ type:'item', kind:'star', x: 4740, y: -40 });
 
-// Era 9: Enkel
-push({ type:'sign', x: 4940, text:'Hannah & Linda · 2017' });
-push({ type:'npc', kind:'hannah', x: 5060 });
-push({ type:'item', kind:'heart', x: 5120, y: -36 });
-push({ type:'npc', kind:'linda', x: 5180 });
-push({ type:'item', kind:'heart', x: 5240, y: -38 });
-push({ type:'item', kind:'star', x: 5320, y: -50 });
-push({ type:'item', kind:'beer', x: 5400, y: -14 });
-push({ type:'item', kind:'brezn', x: 5480, y: -40 });
-push({ type:'item', kind:'leberkaes', x: 5560, y: -22 });
+// === 1977 Star Wars ===
+push({ type:'sign', x: 4870, text:"Möge die Macht..." });
+push({ type:'scenery', kind:'xwing', x: 4990, y: 0 });
+push({ type:'obstacle', kind:'saber', x: 5100, w:14, h:36 });
+push({ type:'item', kind:'star', x: 5170, y: -52 });
+push({ type:'scenery', kind:'vader', x: 5260, y: 0 });
+push({ type:'item', kind:'star', x: 5340, y: -40 });
 
-// Era 10: Geburtstag
-push({ type:'sign', x: 5840, text:'Alles Gute zum 70.!' });
-push({ type:'scenery', kind:'banner', x: 5990, y: 0 });
-push({ type:'item', kind:'heart', x: 6080, y: -42 });
-push({ type:'item', kind:'star', x: 6150, y: -54 });
-push({ type:'item', kind:'heart', x: 6220, y: -42 });
-push({ type:'goal', kind:'cake', x: 6400, y: 0 });
+// === 1983 99 Luftballons ===
+push({ type:'sign', x: 5470, text:"99 Luftballons" });
+push({ type:'scenery', kind:'balloon', x: 5570, y: -50 });
+push({ type:'scenery', kind:'balloon', x: 5640, y: -68 });
+push({ type:'scenery', kind:'balloon', x: 5710, y: -54 });
+push({ type:'scenery', kind:'balloon', x: 5780, y: -72 });
+push({ type:'item', kind:'vinyl', x: 5850, y: -42 });
+push({ type:'obstacle', kind:'stone', x: 5920, w:18, h:14 });
+
+// === 1989 Mauerfall ===
+push({ type:'sign', x: 6060, text:'9. November 1989' });
+push({ type:'scenery', kind:'gate', x: 6180, y: 0 });
+push({ type:'obstacle', kind:'wallBroken', x: 6340, w:20, h:42 });
+push({ type:'item', kind:'star', x: 6410, y: -54 });
+push({ type:'scenery', kind:'trabi', x: 6510, y: 0 });
+push({ type:'item', kind:'dmark', x: 6590, y: -22 });
+
+// === 2000 Millennium ===
+push({ type:'sign', x: 6750, text:'2000 · Prosit!' });
+push({ type:'scenery', kind:'firework', x: 6870, y: -80 });
+push({ type:'scenery', kind:'firework', x: 6950, y: -100 });
+push({ type:'item', kind:'star', x: 7020, y: -42 });
+push({ type:'obstacle', kind:'stone', x: 7100, w:18, h:14 });
+push({ type:'item', kind:'star', x: 7180, y: -50 });
+
+// === 2010 Smartphone ===
+push({ type:'sign', x: 7350, text:'Smile! 📱' });
+push({ type:'scenery', kind:'selfie', x: 7470, y: 0 });
+push({ type:'item', kind:'heart', x: 7550, y: -40 });
+push({ type:'item', kind:'star', x: 7620, y: -50 });
+push({ type:'obstacle', kind:'stone', x: 7700, w:18, h:14 });
+push({ type:'item', kind:'star', x: 7780, y: -38 });
+
+// === 2020er Sofa ===
+push({ type:'sign', x: 7940, text:'Couch-Modus' });
+push({ type:'scenery', kind:'sofa', x: 8060, y: 0 });
+push({ type:'scenery', kind:'tvBig', x: 8170, y: 0 });
+push({ type:'item', kind:'heart', x: 8260, y: -36 });
+push({ type:'obstacle', kind:'stone', x: 8340, w:18, h:14 });
+push({ type:'item', kind:'star', x: 8420, y: -42 });
+
+// === 2026 70er ===
+push({ type:'sign', x: 8580, text:'Alles Gute, Josef!' });
+push({ type:'scenery', kind:'banner', x: 8700, y: 0 });
+push({ type:'item', kind:'heart', x: 8790, y: -42 });
+push({ type:'item', kind:'star', x: 8850, y: -56 });
+push({ type:'item', kind:'heart', x: 8900, y: -42 });
+push({ type:'goal', kind:'cake', x: 8980, y: 0 });
 
 const player = {
   x: 30, y: 0, vx: 0, vy: 0, w: 12, h: 22, onGround: true, facing: 1,
@@ -269,114 +296,115 @@ function spr(grid, x, y, palette, flipX=false) {
   }
 }
 
+// Josef – weiße Haare, weißer Bart, Brille
 const JOSEF_STAND = [
   "....HHHH....",
   "...HHHHHH...",
   "...HHHHHH...",
-  "....SSSS....",
-  "...FKKKKF...",
-  "...FKKKKF...",
+  "...HSSSSH...",
+  "...SKKKKS...",
+  "...KOKKOK...",
   "....KKKK....",
-  "...WWWWWW...",
-  "..WWCWWCWW..",
+  "...DKKKKD...",
+  "...DDDDDD...",
+  "....DDDD....",
   "..WWWWWWWW..",
   "..WCWWWWCW..",
-  "..BBBBBBBB..",
+  "..WWWWWWWW..",
   "..BBBBBBBB..",
   "..BBYBBYBB..",
   "...B....B...",
   "...K....K...",
   "...K....K...",
   "...N....N...",
-  "...N....N...",
-  "..SSS..SSS..",
+  "..ZZZ..ZZZ..",
 ];
 const JOSEF_WALK = [
   "....HHHH....",
   "...HHHHHH...",
   "...HHHHHH...",
-  "....SSSS....",
-  "...FKKKKF...",
-  "...FKKKKF...",
+  "...HSSSSH...",
+  "...SKKKKS...",
+  "...KOKKOK...",
   "....KKKK....",
-  "...WWWWWW...",
-  "..WWCWWCWW..",
+  "...DKKKKD...",
+  "...DDDDDD...",
+  "....DDDD....",
   "..WWWWWWWW..",
   "..WCWWWWCW..",
-  "..BBBBBBBB..",
+  "..WWWWWWWW..",
   "..BBBBBBBB..",
   "..BBYBBYBB..",
   "..B......B..",
   "..K......K..",
   "...K....K...",
   "....N..N....",
-  "...N....N...",
-  ".SSS....SSS.",
+  ".ZZZ....ZZZ.",
 ];
 const JOSEF_JUMP = [
   "....HHHH....",
   "...HHHHHH...",
   "...HHHHHH...",
-  "....SSSS....",
-  "...FKKKKF...",
-  "...FKKKKF...",
+  "...HSSSSH...",
+  "...SKKKKS...",
+  "...KOKKOK...",
   "....KKKK....",
-  "...WWWWWW...",
-  "..WWCWWCWW..",
+  "...DKKKKD...",
+  "...DDDDDD...",
+  "....DDDD....",
   "..WWWWWWWW..",
   "..WCWWWWCW..",
-  "..BBBBBBBB..",
-  "..BBBBBBBB..",
+  "..WWWWWWWW..",
   ".BBBYYYYBBB.",
   "..B......B..",
   "..K......K..",
   "..N......N..",
-  ".SSS....SSS.",
+  ".ZZZ....ZZZ.",
 ];
+// Body-only palette (head will be replaced with real photo)
 const JOSEF_PAL = {
-  H:'#2d5a1a', S:'#3a2210', K:'#f4caa0', F:'#e8b888',
-  W:'#ffffff', C:'#3464a8', B:'#6a3a14', Y:'#caa050', N:'#e8d8a0',
+  W:'#ffffff', C:'#3464a8', B:'#6a3a14',
+  Y:'#caa050', N:'#e8d8a0', Z:'#1a1a1a',
 };
+
+const josefImg = new Image();
+let josefImgReady = false;
+josefImg.onload = () => { josefImgReady = true; };
+josefImg.src = 'josef.png';
 
 function drawJosef() {
   const grid = !player.onGround ? JOSEF_JUMP
     : (Math.abs(player.vx) > 0.5 ? (Math.floor(player.walkPhase) % 2 === 0 ? JOSEF_WALK : JOSEF_STAND) : JOSEF_STAND);
-  const flash = player.hurtT > 0 && Math.floor(player.hurtT * 20) % 2 === 0;
-  if (flash) return;
-  spr(grid, Math.round(player.x), Math.round(player.y), JOSEF_PAL, player.facing < 0);
+  if (player.hurtT > 0 && Math.floor(player.hurtT * 20) % 2 === 0) return;
+  const px0 = Math.round(player.x), py0 = Math.round(player.y);
+  // Body
+  spr(grid, px0, py0, JOSEF_PAL, player.facing < 0);
+  // Echte Foto-Birne von Josef
+  if (josefImgReady) {
+    const hw = 14, hh = 14;
+    const hx = px0 + (12 - hw) / 2;
+    const hy = py0 - 3;
+    if (player.facing < 0) {
+      ctx.save();
+      ctx.translate(hx + hw, hy);
+      ctx.scale(-1, 1);
+      ctx.drawImage(josefImg, 0, 0, hw, hh);
+      ctx.restore();
+    } else {
+      ctx.drawImage(josefImg, hx, hy, hw, hh);
+    }
+  }
 }
 
 const SPR = {
-  beer: [
-    "..MMMMMM..",
-    ".MWFFFFWM.",
-    "MWGGGGGGWM",
-    "MWGGGGGGWM",
-    "MWYYYYYYWM",
-    "MWYYYYYYWM",
-    "MWYYYYYYWM",
-    "MWYYYYYYWM",
-    ".MWWWWWWM.",
-    "..MMMMMM..",
-  ],
-  brezn: [
-    "..BBB..BBB..",
-    ".BWWWBBWWWB.",
-    "BWW.BBBB.WWB",
-    "BW.BWWWWB.WB",
-    ".BBWWWWWWBB.",
-    "..BWWWWWWB..",
-    "..BWWWWWWB..",
-    "...BBBBBB...",
-  ],
-  leberkaes: [
-    "WWWWWWWWWW",
-    "WYYYYYYYWW",
-    "WLLLLLLLLW",
-    "WLLRRRRLLW",
-    "WLLLLLLLLW",
-    "WYYYYYYYWW",
-    "WWWWWWWWWW",
+  star: [
+    "....Y....",
+    "...YYY...",
+    "YYYYYYYYY",
+    ".YYYYYYY.",
+    "..YYYYY..",
+    ".YY.Y.YY.",
+    "Y...Y...Y",
   ],
   heart: [
     ".RR..RR.",
@@ -386,15 +414,6 @@ const SPR = {
     ".RPPPPR.",
     "..RPPR..",
     "...RR...",
-  ],
-  star: [
-    "....Y....",
-    "...YYY...",
-    "YYYYYYYYY",
-    ".YYYYYYY.",
-    "..YYYYY..",
-    ".YY.Y.YY.",
-    "Y...Y...Y",
   ],
   dmark: [
     "..CCCC..",
@@ -406,11 +425,22 @@ const SPR = {
     ".CYYYYC.",
     "..CCCC..",
   ],
+  vinyl: [
+    "..BBBBB..",
+    ".BBLLLBB.",
+    "BBLRRRLBB",
+    "BLR R RLB",
+    "BLRRRRRLB",
+    "BLR R RLB",
+    "BBLRRRLBB",
+    ".BBLLLBB.",
+    "..BBBBB..",
+  ],
 };
 const ITEM_PAL = {
-  M:'#3a3a3a', W:'#f4f4f4', F:'#f8e8c0', G:'#c8a868', Y:'#e8b830',
-  B:'#7a4a14', L:'#e8c890', R:'#c83030', P:'#ff6688',
-  C:'#d4d4d4', D:'#8a6a20',
+  Y:'#ffd700', R:'#c83030', P:'#ff6688',
+  C:'#d4d4d4', D:'#8a6a20', M:'#caa030',
+  B:'#1a1a1a', L:'#3a3a3a',
 };
 
 function drawItem(it, sx, sy) {
@@ -420,7 +450,7 @@ function drawItem(it, sx, sy) {
 
 function drawSign(x, gy, text) {
   px(x+5, gy-22, 2, 22, '#6a4a20');
-  const w = Math.min(86, Math.max(40, text.length * 4 + 8));
+  const w = Math.min(100, Math.max(46, text.length * 4 + 10));
   px(x-w/2+6, gy-34, w, 12, '#c89858');
   px(x-w/2+6, gy-34, w, 1,  '#7a5828');
   px(x-w/2+6, gy-23, w, 1,  '#7a5828');
@@ -431,9 +461,9 @@ function drawSign(x, gy, text) {
   ctx.fillText(text, x+6, gy-32);
 }
 
+// ===== Scenery drawers =====
 function drawChurch(x, gy) {
   px(x, gy-50, 16, 50, '#e8e0d0');
-  px(x+2, gy-46, 12, 1, '#a89878');
   px(x+6, gy-40, 4, 6, '#3a3a8a');
   px(x+6, gy-26, 4, 6, '#3a3a8a');
   px(x+1, gy-58, 14, 4, '#7a3a3a');
@@ -452,9 +482,81 @@ function drawKaefer(x, gy) {
   px(x+20, gy-17, 8, 4, '#a0d8e8');
   px(x+9,  gy-2, 6, 4, '#1a1a1a');
   px(x+23, gy-2, 6, 4, '#1a1a1a');
-  px(x+10, gy-1, 4, 2, '#888888');
-  px(x+24, gy-1, 4, 2, '#888888');
+  px(x+10, gy-1, 4, 2, '#888');
+  px(x+24, gy-1, 4, 2, '#888');
   px(x+34, gy-10, 2, 2, '#ffd060');
+}
+
+function drawSputnik(x, sy) {
+  // Sputnik klein hoch oben
+  px(x+4, sy+4, 6, 6, '#d8d8d8');
+  px(x+3, sy+5, 1, 4, '#d8d8d8');
+  px(x+10,sy+5, 1, 4, '#d8d8d8');
+  // 4 Antennen
+  px(x, sy, 4, 1, '#a0a0a0');
+  px(x, sy-1, 1, 2, '#a0a0a0');
+  px(x+10, sy, 4, 1, '#a0a0a0');
+  px(x+13, sy-1, 1, 2, '#a0a0a0');
+  px(x, sy+13, 4, 1, '#a0a0a0');
+  px(x+10,sy+13, 4, 1, '#a0a0a0');
+}
+
+function drawMauerbau(x, gy) {
+  for (let i=0;i<28;i+=6) px(x, gy-28+i, 30, 5, i%12===0?'#d0d0d0':'#b8b8b8');
+  px(x+38, gy-50, 3, 50, '#c83030');
+  px(x+22, gy-50, 22, 2, '#c83030');
+  px(x+22, gy-48, 2, 6, '#888');
+  px(x+20, gy-42, 6, 4, '#b0b0b0');
+}
+
+function drawKennedy(x, gy) {
+  // Politiker am Rednerpult
+  // Pult
+  px(x+4, gy-12, 12, 12, '#8a5a30');
+  px(x+4, gy-14, 12, 2, '#a87838');
+  px(x+8, gy-16, 4, 2, '#3a3a3a'); // Mikro
+  // Person
+  px(x+7, gy-30, 6, 8, '#f4caa0');  // Kopf
+  px(x+7, gy-32, 6, 2, '#3a2410');  // Haar
+  px(x+8, gy-28, 1, 1, '#000');     // Augen
+  px(x+11,gy-28, 1, 1, '#000');
+  px(x+6, gy-22, 8, 8, '#1a3a6a');  // Anzug
+  px(x+8, gy-22, 4, 8, '#fff');     // Hemd
+  px(x+9, gy-21, 2, 5, '#c83030');  // Krawatte
+  // USA-Flagge Sterne dezent
+  px(x+18, gy-26, 6, 4, '#3464a8');
+  for (let i=0;i<3;i++) px(x+19+i*2, gy-25, 1, 1, '#fff');
+}
+
+function drawKrapfen(x, sy) {
+  // Berliner / Pfannkuchen schwebend
+  px(x+1, sy+1, 8, 7, '#caa030');
+  px(x+2, sy, 6, 1, '#caa030');
+  px(x+0, sy+2, 1, 5, '#caa030');
+  px(x+9, sy+2, 1, 5, '#caa030');
+  px(x+3, sy+3, 4, 3, '#caa530');
+  // Zucker
+  px(x+3, sy+1, 4, 1, '#fff');
+}
+
+function drawBeatles(x, gy) {
+  // 4 kleine Beatles mit Pilzkopf, Gitarren
+  for (let i=0;i<4;i++) {
+    const bx = x + i*8;
+    // Pilzkopf
+    px(bx+1, gy-22, 6, 4, '#3a2410');
+    px(bx+0, gy-20, 8, 2, '#3a2410');
+    // Gesicht
+    px(bx+2, gy-18, 4, 2, '#f4caa0');
+    // Hemd/Anzug
+    px(bx+2, gy-16, 4, 8, '#1a1a1a');
+    // Gitarre
+    px(bx+5, gy-14, 3, 4, '#caa030');
+    px(bx+5, gy-12, 1, 2, '#3a2410');
+    // Beine
+    px(bx+2, gy-8, 1, 8, '#1a1a1a');
+    px(bx+5, gy-8, 1, 8, '#1a1a1a');
+  }
 }
 
 function drawRocket(x, gy) {
@@ -468,42 +570,111 @@ function drawRocket(x, gy) {
   px(x+3,  gy-8,  4, 4, '#ffff80');
 }
 
-function drawTruck(x, gy) {
-  px(x,    gy-18, 22, 14, '#a83030');
-  px(x+22, gy-14, 12, 10, '#a83030');
-  px(x+24, gy-12, 8, 6, '#a0d8e8');
-  px(x+2,  gy-2, 5, 3, '#1a1a1a');
-  px(x+14, gy-2, 5, 3, '#1a1a1a');
-  px(x+26, gy-2, 5, 3, '#1a1a1a');
-  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='left';
-  ctx.fillText('VERSAND', x+1, gy-15);
+function drawAstronaut(x, gy) {
+  px(x+2, gy-22, 8, 8, '#e8e8e8');
+  px(x+3, gy-21, 6, 4, '#3a3a6a');
+  px(x+2, gy-14, 8, 8, '#e8e8e8');
+  px(x+1, gy-14, 1, 6, '#e8e8e8');
+  px(x+10,gy-14, 1, 6, '#e8e8e8');
+  px(x+3, gy-6, 2, 6, '#e8e8e8');
+  px(x+7, gy-6, 2, 6, '#e8e8e8');
+  px(x+12, gy-26, 1, 22, '#888');
+  px(x+13, gy-26, 8, 6, '#000');
+  px(x+13, gy-22, 8, 2, '#c83030');
+  px(x+13, gy-20, 8, 2, '#caa030');
 }
 
-function drawMuetze(x, gy) {
-  px(x+5, gy-18, 2, 18, '#6a4a20');
-  px(x,   gy-26, 12, 8, '#3464a8');
-  px(x,   gy-22, 12, 2, '#c83030');
-  px(x,   gy-20, 12, 2, '#f4f4f4');
-  px(x+1, gy-28, 10, 4, '#1a3a78');
+function drawRings(x, gy) {
+  const ring = (cx, cy, col) => {
+    px(cx-3, cy-1, 2, 3, col);
+    px(cx+2, cy-1, 2, 3, col);
+    px(cx-2, cy-3, 5, 1, col);
+    px(cx-2, cy+2, 5, 1, col);
+  };
+  ring(x+0,  gy-30, '#3464a8');
+  ring(x+8,  gy-30, '#1a1a1a');
+  ring(x+16, gy-30, '#c83030');
+  ring(x+4,  gy-26, '#caa030');
+  ring(x+12, gy-26, '#3a8a3a');
+  px(x+10, gy-22, 2, 22, '#888');
 }
 
-function drawCrane(x, gy) {
-  px(x+10, gy-70, 4, 70, '#c83030');
-  px(x-10, gy-66, 50, 3, '#c83030');
-  px(x-12, gy-68, 6, 8, '#a83030');
-  px(x-10, gy-63, 2, 8, '#c83030');
-  px(x-12, gy-55, 6, 4, '#3a3a3a');
+function drawWaldi(x, gy) {
+  px(x+2, gy-8, 22, 6, '#88c8f0');
+  px(x+2, gy-7, 22, 1, '#c83030');
+  px(x+2, gy-6, 22, 1, '#caa030');
+  px(x+2, gy-5, 22, 1, '#3a8a3a');
+  px(x+2, gy-4, 22, 1, '#88c8f0');
+  px(x+18, gy-12, 6, 5, '#88c8f0');
+  px(x+22, gy-13, 3, 2, '#88c8f0');
+  px(x+18, gy-13, 2, 2, '#caa030');
+  px(x+21, gy-11, 1, 1, '#000');
+  px(x+4, gy-2, 2, 2, '#88c8f0');
+  px(x+10, gy-2, 2, 2, '#88c8f0');
+  px(x+16, gy-2, 2, 2, '#88c8f0');
+  px(x+20, gy-2, 2, 2, '#88c8f0');
 }
 
-function drawTruckBoegl(x, gy) {
-  px(x,    gy-16, 28, 12, '#f4c020');
-  px(x+28, gy-12, 10, 8, '#f4c020');
-  px(x+30, gy-10, 6, 4, '#a0d8e8');
-  px(x+3,  gy-2, 5, 3, '#1a1a1a');
-  px(x+18, gy-2, 5, 3, '#1a1a1a');
-  px(x+30, gy-2, 5, 3, '#1a1a1a');
-  ctx.fillStyle='#1a1a1a'; ctx.font='bold 6px monospace';
-  ctx.fillText('BÖGL', x+4, gy-13);
+function drawHorseRider(x, gy) {
+  // Pferd statt Auto (Sonntagsfahrverbot)
+  // Pferd
+  px(x+2, gy-14, 18, 8, '#7a4a20');
+  px(x+18, gy-18, 4, 6, '#7a4a20'); // Kopf/Hals
+  px(x+20, gy-19, 3, 2, '#7a4a20');
+  px(x+18, gy-16, 1, 1, '#000');
+  px(x+3, gy-15, 2, 1, '#3a2410');  // Mähne
+  px(x+5, gy-15, 2, 1, '#3a2410');
+  // Beine
+  px(x+3, gy-6, 2, 6, '#7a4a20');
+  px(x+8, gy-6, 2, 6, '#7a4a20');
+  px(x+13, gy-6, 2, 6, '#7a4a20');
+  px(x+17, gy-6, 2, 6, '#7a4a20');
+  // Schwanz
+  px(x, gy-12, 2, 4, '#3a2410');
+  // Reiter
+  px(x+8, gy-22, 6, 4, '#1a3a6a');
+  px(x+9, gy-26, 4, 4, '#f4caa0');
+  px(x+9, gy-25, 1, 1, '#000');
+  px(x+12, gy-25, 1, 1, '#000');
+}
+
+function drawEmptyAutobahn(x, gy) {
+  // Schild "AUTOFREI" mit leerer Straße im Hintergrund
+  px(x+8, gy-26, 2, 26, '#888'); // Pfosten
+  px(x, gy-40, 18, 14, '#c83030');
+  ctx.fillStyle='#fff'; ctx.font='bold 5px monospace'; ctx.textAlign='center';
+  ctx.fillText('AUTO', x+9, gy-38);
+  ctx.fillText('FREI', x+9, gy-32);
+}
+
+function drawXwing(x, gy) {
+  px(x+4, gy-68, 14, 4, '#d8d8d8');
+  px(x+2, gy-72, 6, 2, '#a0a0a0');
+  px(x+14,gy-72, 6, 2, '#a0a0a0');
+  px(x+2, gy-62, 6, 2, '#a0a0a0');
+  px(x+14,gy-62, 6, 2, '#a0a0a0');
+  px(x+16,gy-66, 2, 2, '#c83030');
+  px(x+18,gy-67, 4, 1, '#ff8030');
+  px(x+22,gy-67, 4, 1, '#ff8030');
+}
+
+function drawVader(x, gy) {
+  px(x+4, gy-30, 12, 4, '#1a1a1a');
+  px(x+3, gy-26, 14, 8, '#1a1a1a');
+  px(x+5, gy-22, 4, 2, '#3a3a3a');
+  px(x+11,gy-22, 4, 2, '#3a3a3a');
+  px(x+2, gy-18, 16, 14, '#1a1a1a');
+  px(x+8, gy-14, 4, 4, '#c83030');
+}
+
+function drawBalloon(x, gy_sy) {
+  const sy = gy_sy;
+  px(x+2, sy, 8, 10, '#c83030');
+  px(x+1, sy+1, 1, 6, '#c83030');
+  px(x+10, sy+1, 1, 6, '#c83030');
+  px(x+3, sy+1, 2, 2, '#ff8888');
+  px(x+5, sy+10, 2, 2, '#c83030');
+  px(x+5, sy+12, 1, 14, '#888');
 }
 
 function drawGate(x, gy) {
@@ -515,67 +686,81 @@ function drawGate(x, gy) {
   px(x+22, gy-63, 16, 3, '#3a3a3a');
 }
 
+function drawTrabi(x, gy) {
+  const c = '#d8d088';
+  px(x+2, gy-12, 26, 10, c);
+  px(x+6, gy-18, 18, 6, c);
+  px(x+8, gy-17, 6, 4, '#a0d8e8');
+  px(x+16,gy-17, 6, 4, '#a0d8e8');
+  px(x+5, gy-2, 5, 3, '#1a1a1a');
+  px(x+20,gy-2, 5, 3, '#1a1a1a');
+  px(x+26,gy-10, 2, 2, '#ffd060');
+}
+
+function drawFirework(x, sy) {
+  // Feuerwerk explodierend
+  const colors = ['#ffd700','#c83030','#3464a8','#ff8030','#88e8ff'];
+  for (let i=0;i<10;i++) {
+    const a = i / 10 * Math.PI * 2;
+    const r = 10;
+    const fx = x + Math.cos(a)*r;
+    const fy = sy + Math.sin(a)*r;
+    px(fx, fy, 2, 2, colors[i % colors.length]);
+  }
+  px(x-1, sy-1, 3, 3, '#fff');
+}
+
+function drawSelfie(x, gy) {
+  // Person macht Selfie mit Handy
+  // Person
+  px(x+4, gy-26, 8, 6, '#f4caa0');
+  px(x+4, gy-28, 8, 2, '#caa050');
+  px(x+5, gy-25, 1, 1, '#000');
+  px(x+9, gy-25, 1, 1, '#000');
+  px(x+6, gy-22, 4, 1, '#000');  // Lächeln
+  px(x+3, gy-20, 10, 10, '#3a8a8a');
+  // Arm hochgestreckt
+  px(x+12, gy-22, 1, 6, '#f4caa0');
+  px(x+13, gy-26, 1, 4, '#f4caa0');
+  // Handy
+  px(x+14, gy-30, 6, 8, '#1a1a1a');
+  px(x+15, gy-29, 4, 6, '#88c8f0');
+  // Beine
+  px(x+5, gy-10, 2, 10, '#1a3a6a');
+  px(x+9, gy-10, 2, 10, '#1a3a6a');
+}
+
+function drawSofa(x, gy) {
+  // Sofa
+  px(x, gy-18, 30, 14, '#7a3a5a');
+  px(x, gy-22, 30, 4, '#9a5a7a');
+  px(x, gy-22, 4, 18, '#9a5a7a');
+  px(x+26, gy-22, 4, 18, '#9a5a7a');
+  // Kissen
+  px(x+6, gy-20, 8, 6, '#caa050');
+  px(x+16, gy-20, 8, 6, '#caa050');
+}
+
+function drawTvBig(x, gy) {
+  // Flat TV
+  px(x, gy-44, 36, 24, '#1a1a1a');
+  px(x+2, gy-42, 32, 20, '#3464a8');
+  // Streaming-Logo "N" rot
+  px(x+15, gy-38, 2, 12, '#c83030');
+  px(x+19, gy-38, 2, 12, '#c83030');
+  px(x+17, gy-34, 2, 4, '#c83030');
+  // Standfuß
+  px(x+14, gy-20, 8, 4, '#1a1a1a');
+  px(x+10, gy-18, 16, 2, '#3a3a3a');
+}
+
 function drawBanner(x, gy) {
-  px(x, gy-60, 80, 22, '#ffd700');
-  px(x, gy-60, 80, 2, '#caa030');
-  px(x, gy-40, 80, 2, '#caa030');
+  px(x, gy-60, 84, 22, '#ffd700');
+  px(x, gy-60, 84, 2, '#caa030');
+  px(x, gy-40, 84, 2, '#caa030');
   ctx.fillStyle='#a83030'; ctx.font='bold 16px monospace'; ctx.textAlign='center';
-  ctx.fillText('JOSEF · 70', x+40, gy-58);
-  px(x-4, gy-66, 88, 1, '#3a3a3a');
-}
-
-function drawTinyPerson(x, gy, palOverride) {
-  const pal = Object.assign({}, JOSEF_PAL, palOverride||{});
-  const grid = [
-    "..HHHH..",
-    ".HKKKKH.",
-    ".HKKKKH.",
-    "..KKKK..",
-    ".WWWWWW.",
-    ".WWWWWW.",
-    ".BBBBBB.",
-    ".BBBBBB.",
-    "..B..B..",
-    "..K..K..",
-    "..N..N..",
-    "..S..S..",
-  ];
-  spr(grid, x, gy-12, pal);
-}
-
-function drawDorothee(x, gy) {
-  const pal = { H:'#a05030', K:'#f4caa0', W:'#f4f4f4', B:'#a83060', N:'#e8d8a0', S:'#5a3a20' };
-  drawTinyPerson(x, gy, pal);
-  px(x+2, gy-7, 4, 2, '#ffffff');
-  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
-  ctx.fillText('Dorothee', x+4, gy-18);
-}
-function drawMartin(x, gy) {
-  const pal = { H:'#caa050', K:'#f4caa0', W:'#3464a8', B:'#3a3a3a', N:'#e8d8a0', S:'#3a2410' };
-  drawTinyPerson(x, gy, pal);
-  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
-  ctx.fillText('Martin', x+4, gy-18);
-}
-function drawHannah(x, gy) {
-  const pal = { H:'#caa030', K:'#f4caa0', W:'#e88aa8', B:'#a83060', N:'#e8d8a0', S:'#caa030' };
-  drawTinyPerson(x, gy+2, pal);
-  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
-  ctx.fillText('Hannah', x+4, gy-16);
-}
-function drawLinda(x, gy) {
-  const pal = { H:'#7a4a20', K:'#f4caa0', W:'#a0e8a0', B:'#3464a8', N:'#e8d8a0', S:'#5a3a20' };
-  drawTinyPerson(x, gy+2, pal);
-  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
-  ctx.fillText('Linda', x+4, gy-16);
-}
-function drawLurch(x, gy) {
-  px(x, gy-4, 22, 4, '#caa030');
-  px(x+2, gy-6, 18, 2, '#caa030');
-  px(x+20, gy-3, 4, 2, '#caa030');
-  px(x+3, gy-5, 1, 1, '#000');
-  px(x+5, gy-5, 1, 1, '#000');
-  px(x+8, gy-5, 2, 1, '#7a3a10');
-  px(x+14, gy-5, 2, 1, '#7a3a10');
+  ctx.fillText('JOSEF · 70', x+42, gy-58);
+  px(x-4, gy-66, 92, 1, '#3a3a3a');
 }
 
 function drawObstacle(o, gy) {
@@ -583,30 +768,20 @@ function drawObstacle(o, gy) {
     px(o.x, gy-o.h, o.w, o.h, '#888');
     px(o.x, gy-o.h, o.w, 2, '#aaa');
     px(o.x, gy-2, o.w, 2, '#666');
-  } else if (o.kind === 'parcel') {
-    px(o.x, gy-o.h, o.w, o.h, '#b88858');
-    px(o.x+2, gy-o.h+2, o.w-4, 2, '#d8a878');
-    px(o.x, gy-o.h/2-1, o.w, 2, '#e8d8a0');
-    px(o.x+o.w/2-1, gy-o.h, 2, o.h, '#e8d8a0');
-  } else if (o.kind === 'parcelStack') {
-    px(o.x, gy-12, o.w, 12, '#b88858');
-    px(o.x+1, gy-24, o.w-2, 12, '#d89868');
-    px(o.x+2, gy-o.h, o.w-4, o.h-24, '#b88858');
-  } else if (o.kind === 'concrete') {
-    px(o.x, gy-o.h, o.w, o.h, '#a0a0a0');
-    px(o.x, gy-o.h, o.w, 2, '#c0c0c0');
-    px(o.x+2, gy-o.h+4, o.w-4, 2, '#888');
-    px(o.x+2, gy-o.h+8, o.w-4, 2, '#888');
   } else if (o.kind === 'crater') {
     px(o.x, gy-2, o.w, 2, '#3a3a3a');
     px(o.x+2, gy-4, o.w-4, 2, '#5a5a5a');
-  } else if (o.kind === 'wall') {
+  } else if (o.kind === 'wallLow' || o.kind === 'wallBroken') {
     for (let i=0;i<o.h;i+=6) {
       px(o.x, gy-o.h+i, o.w, 5, i%12===0 ? '#d0d0d0':'#b8b8b8');
     }
     px(o.x+2, gy-o.h+8, 3, 3, '#c83030');
-    px(o.x+6, gy-o.h+12, 3, 3, '#3464a8');
-    px(o.x+3, gy-o.h+18, 4, 2, '#caa030');
+    px(o.x+6, gy-o.h+14, 3, 3, '#3464a8');
+    px(o.x+3, gy-o.h+22, 4, 2, '#caa030');
+  } else if (o.kind === 'saber') {
+    px(o.x+4, gy-4, 6, 4, '#3a3a3a');
+    px(o.x+5, gy-o.h, 4, o.h-4, '#88e8ff');
+    px(o.x+6, gy-o.h, 2, o.h-4, '#ffffff');
   }
 }
 
@@ -627,9 +802,15 @@ function drawCake(x, gy) {
 }
 
 const clouds = [];
-for (let i=0;i<24;i++) clouds.push({ x: Math.random()*WORLD_END, y: 14 + Math.random()*40, w: 16+Math.random()*22 });
-const stars = [];
-for (let i=0;i<60;i++) stars.push({ x: 1200 + Math.random()*700, y: 10 + Math.random()*80 });
+for (let i=0;i<32;i++) clouds.push({ x: Math.random()*WORLD_END, y: 14 + Math.random()*40, w: 16+Math.random()*22 });
+const moonStars = [];
+for (let i=0;i<80;i++) moonStars.push({ x: 3000 + Math.random()*600, y: 10 + Math.random()*80 });
+const swStars = [];
+for (let i=0;i<60;i++) swStars.push({ x: 4800 + Math.random()*600, y: 10 + Math.random()*70 });
+const milStars = [];
+for (let i=0;i<70;i++) milStars.push({ x: 6700 + Math.random()*600, y: 10 + Math.random()*80 });
+const sputnikStars = [];
+for (let i=0;i<60;i++) sputnikStars.push({ x: 600 + Math.random()*600, y: 8 + Math.random()*70 });
 
 function drawCloud(c, camX) {
   const x = c.x - camX*0.4;
@@ -638,6 +819,7 @@ function drawCloud(c, camX) {
   px(x+2, c.y-2, c.w-4, 2, '#ffffff');
   px(x+4, c.y+4, c.w-8, 2, '#e8e8f0');
 }
+
 function drawMountains(camX) {
   const baseY = VIEW_H - GROUND_H;
   ctx.fillStyle = '#6a7a98';
@@ -666,6 +848,9 @@ function drawMountains(camX) {
 
 let camX = 0;
 let score = 0;
+let stumbles = 0;
+let startTime = 0;
+let elapsedAtEnd = 0;
 let prevTime = 0;
 let running = false;
 let finished = false;
@@ -677,6 +862,17 @@ function showToast(msg, dur=1400) {
   showToast._t = setTimeout(()=>toastEl.classList.remove('show'), dur);
 }
 
+// Fitness-Joke-Toasts beim Loslaufen / nach Stolperern
+const SCHNAUF_LINES = [
+  'Schnauf... 😮‍💨',
+  'Halt durch, Josef!',
+  'Geht doch noch! 💪',
+  'Knie, halt durch...',
+  'Wo ist die Lesebrille?',
+  'Hatte ich Tabletten heute?',
+  'Bin ich schon im Ziel?',
+];
+
 let lastEraName = '';
 function updateEraLabel() {
   const e = currentEra(player.x).name;
@@ -687,7 +883,10 @@ function updateEraLabel() {
   }
 }
 
+let schnaufTimer = 0;
+
 function update(dt) {
+  schnaufTimer -= dt;
   let ax = 0;
   if (input.left) ax -= 1;
   if (input.right) ax += 1;
@@ -695,20 +894,23 @@ function update(dt) {
   if (ax > 0) player.facing = 1;
   else if (ax < 0) player.facing = -1;
 
+  // Gelegentlich ein Schnaufer-Toast
+  if (Math.abs(player.vx) > 0.5 && schnaufTimer <= 0 && Math.random() < 0.005) {
+    showToast(SCHNAUF_LINES[Math.floor(Math.random() * SCHNAUF_LINES.length)], 1000);
+    schnaufTimer = 8;
+  }
+
   if (player.onGround && input.jumpPressed) {
     player.vy = JUMP_V;
     player.onGround = false;
   }
   input.jumpPressed = false;
-
   if (!input.jump && player.vy < -3) player.vy = -3;
 
   player.vy += GRAVITY;
   if (player.vy > 12) player.vy = 12;
-
   player.x += player.vx;
   player.y += player.vy;
-
   if (Math.abs(player.vx) > 0.1) player.walkPhase += Math.abs(player.vx) * 0.18;
 
   if (player.x < 0) player.x = 0;
@@ -741,7 +943,9 @@ function update(dt) {
           player.hurtT = 0.5;
           player.vy = -4;
           player.onGround = false;
-          showToast('Hoppla! 😅', 700);
+          stumbles++;
+          const stumbleToasts = ['Au, mei Hüft!', 'Hoppla! 🤕', 'Knie!', 'Verdammt...', 'Wo war der Stock?'];
+          showToast(stumbleToasts[Math.floor(Math.random()*stumbleToasts.length)], 800);
         }
       }
     }
@@ -749,40 +953,25 @@ function update(dt) {
 
   for (const it of things) {
     if (it.collected) continue;
-    if (it.type === 'item' || it.type === 'npc') {
-      const iy = gy + (it.y || -8);
-      const iw = it.type==='npc' ? 10 : 10;
-      const ih = it.type==='npc' ? 14 : 10;
-      const ix = it.x;
-      if (player.x + player.w > ix && player.x < ix + iw &&
-          player.y + player.h > iy && player.y < iy + ih) {
-        it.collected = true;
-        if (it.type === 'item') {
-          score++;
-          hudScore.textContent = score;
-          const labels = { beer:'+1 🍺 Bier!', brezn:'+1 🥨 Brezn!', leberkaes:'+1 🥩 Leberkäs!',
-                           heart:'+1 ❤️', star:'+1 ⭐', dmark:'+1 💰 D-Mark!' };
-          showToast(labels[it.kind] || '+1', 900);
-        } else if (it.type === 'npc') {
-          const greets = {
-            dorothee:'Servus Dorothee! ❤️',
-            martin:  'Hallo Martin! 👋',
-            hannah:  'Hi Opa! – Hannah 🌸',
-            linda:   'Hi Opa! – Linda 🌸',
-            lurch:   'Der Lurch! 🦎',
-          };
-          showToast(greets[it.kind] || 'Hallo!', 1400);
-        }
-      }
+    if (it.type !== 'item') continue;
+    const iy = gy + (it.y || -8);
+    const ix = it.x;
+    if (player.x + player.w > ix && player.x < ix + 10 &&
+        player.y + player.h > iy && player.y < iy + 10) {
+      it.collected = true;
+      score++;
+      hudScore.textContent = score;
+      const labels = { star:'+1 ⭐', heart:'+1 ❤️', dmark:'+1 💰', vinyl:'+1 💿' };
+      showToast(labels[it.kind] || '+1', 700);
     }
   }
 
   for (const g of things) {
     if (g.type === 'goal' && !finished) {
-      const gx = g.x;
-      if (player.x + player.w > gx && player.x < gx + 36) {
+      if (player.x + player.w > g.x && player.x < g.x + 36) {
         finished = true;
         running = false;
+        elapsedAtEnd = (performance.now() - startTime) / 1000;
         showEnd();
       }
     }
@@ -805,15 +994,23 @@ function render() {
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, VIEW_W, VIEW_H);
 
-  if (currentEra(player.x).name.includes('Mondlandung')) {
-    for (const s of stars) {
+  const curName = currentEra(player.x).name;
+
+  // Nacht-Sterne in dunklen Eras
+  function drawStars(arr) {
+    for (const s of arr) {
       const sx = s.x - camX;
       if (sx > -2 && sx < VIEW_W) px(sx, s.y, 1, 1, '#ffffff');
     }
+  }
+  if (curName.includes('Sputnik'))     drawStars(sputnikStars);
+  if (curName.includes('Mondlandung')) { drawStars(moonStars);
     px(VIEW_W - 50, 18, 18, 18, '#e8e8d0');
     px(VIEW_W - 46, 20, 4, 4, '#c8c8b0');
     px(VIEW_W - 38, 26, 6, 4, '#c8c8b0');
   }
+  if (curName.includes('Star Wars'))   drawStars(swStars);
+  if (curName.includes('Millennium'))  drawStars(milStars);
 
   for (const c of clouds) drawCloud(c, camX);
   drawMountains(camX);
@@ -828,36 +1025,42 @@ function render() {
   ctx.save();
   ctx.translate(-camX, 0);
   for (const t of things) {
-    const sx = t.x;
-    if (sx - camX < -120 || sx - camX > VIEW_W + 120) continue;
+    if (t.x - camX < -150 || t.x - camX > VIEW_W + 150) continue;
     if (t.type === 'scenery') {
+      const sx = t.x, sy = gy + (t.y || 0);
       switch (t.kind) {
-        case 'church': drawChurch(sx, gy); break;
-        case 'kaefer': drawKaefer(sx, gy); break;
-        case 'rocket': drawRocket(sx, gy); break;
-        case 'truck':  drawTruck(sx, gy); break;
-        case 'muetze': drawMuetze(sx, gy); break;
-        case 'crane':  drawCrane(sx, gy); break;
-        case 'truckBoegl': drawTruckBoegl(sx, gy); break;
-        case 'gate':   drawGate(sx, gy); break;
-        case 'banner': drawBanner(sx, gy); break;
+        case 'church':          drawChurch(sx, gy); break;
+        case 'kaefer':          drawKaefer(sx, gy); break;
+        case 'sputnik':         drawSputnik(sx, sy); break;
+        case 'mauerbau':        drawMauerbau(sx, gy); break;
+        case 'kennedy':         drawKennedy(sx, gy); break;
+        case 'krapfen':         drawKrapfen(sx, sy); break;
+        case 'beatles':         drawBeatles(sx, gy); break;
+        case 'rocket':          drawRocket(sx, gy); break;
+        case 'astronaut':       drawAstronaut(sx, gy); break;
+        case 'rings':           drawRings(sx, gy); break;
+        case 'waldi':           drawWaldi(sx, gy); break;
+        case 'horseRider':      drawHorseRider(sx, gy); break;
+        case 'emptyAutobahn':   drawEmptyAutobahn(sx, gy); break;
+        case 'xwing':           drawXwing(sx, gy); break;
+        case 'vader':           drawVader(sx, gy); break;
+        case 'balloon':         drawBalloon(sx, sy); break;
+        case 'gate':            drawGate(sx, gy); break;
+        case 'trabi':           drawTrabi(sx, gy); break;
+        case 'firework':        drawFirework(sx, sy); break;
+        case 'selfie':          drawSelfie(sx, gy); break;
+        case 'sofa':            drawSofa(sx, gy); break;
+        case 'tvBig':           drawTvBig(sx, gy); break;
+        case 'banner':          drawBanner(sx, gy); break;
       }
     } else if (t.type === 'sign') {
-      drawSign(sx, gy, t.text);
+      drawSign(t.x, gy, t.text);
     } else if (t.type === 'obstacle') {
       drawObstacle(t, gy);
     } else if (t.type === 'item' && !t.collected) {
-      drawItem(t, sx, gy + (t.y || -8));
-    } else if (t.type === 'npc' && !t.collected) {
-      switch (t.kind) {
-        case 'dorothee': drawDorothee(sx, gy); break;
-        case 'martin':   drawMartin(sx, gy); break;
-        case 'hannah':   drawHannah(sx, gy); break;
-        case 'linda':    drawLinda(sx, gy); break;
-        case 'lurch':    drawLurch(sx, gy); break;
-      }
+      drawItem(t, t.x, gy + (t.y || -8));
     } else if (t.type === 'goal') {
-      drawCake(sx, gy);
+      drawCake(t.x, gy);
     }
   }
   drawJosef();
@@ -876,24 +1079,49 @@ function loop(t) {
 }
 requestAnimationFrame(loop);
 
+function fitnessVerdict(score, stumbles, time) {
+  const totalItems = things.filter(t => t.type==='item').length;
+  const pct = score / totalItems;
+  // Verdict
+  let verdict, comment;
+  if (pct >= 0.85 && stumbles <= 2 && time < 90) {
+    verdict = '🏆 Olympia-reif!';
+    comment = 'Du bist ja noch jünger als Hannah und Linda. Die 70 kann kommen — Bratwürste sind dir sicher.';
+  } else if (pct >= 0.7 && stumbles <= 4) {
+    verdict = '💪 Fit wie ein Turnschuh!';
+    comment = 'Mit der Performance darfst du morgen ohne Bedenken den 70. feiern. Vielleicht sogar Tanzen.';
+  } else if (pct >= 0.5) {
+    verdict = '👍 Geht noch!';
+    comment = 'Solides Mittelfeld. Eine Maß zum Mittag, ein Schläfchen nach — alles im grünen Bereich.';
+  } else if (stumbles >= 6) {
+    verdict = '🦴 Knie-Check empfohlen';
+    comment = 'Die Hüfte hat geknirscht, der Stock ist verschollen. Trotzdem: 70 ist ein guter Grund zum Feiern.';
+  } else {
+    verdict = '🛋️ Couch-Modus';
+    comment = 'Ehrlich gesagt — bleib morgen lieber auf der Couch und lass dich bedienen. Hast du dir verdient.';
+  }
+  return { verdict, comment, pct, totalItems };
+}
+
 function showEnd() {
   overlay.classList.remove('hidden');
   controls.classList.add('hidden');
-  const totalItems = things.filter(t => t.type==='item').length;
-  const collectedItems = things.filter(t => t.type==='item' && t.collected).length;
-  const npcs = things.filter(t => t.type==='npc' && t.collected).map(t=>({
-    dorothee:'Dorothee', martin:'Martin', hannah:'Hannah', linda:'Linda', lurch:'der Lurch'
-  }[t.kind] || t.kind));
-  let extras = '';
-  if (npcs.length) extras = `<p class="small">Begegnet: ${npcs.join(', ')}</p>`;
+  const v = fitnessVerdict(score, stumbles, elapsedAtEnd);
+  const mins = Math.floor(elapsedAtEnd / 60);
+  const secs = Math.floor(elapsedAtEnd % 60).toString().padStart(2,'0');
   overlay.innerHTML = `
-    <h1>🎂 Herzlichen Glückwunsch zum 70., Josef! 🎂</h1>
-    <p>Von Sengenthal über Max Bögl bis zu Hannah und Linda – was für eine Reise.</p>
-    <div class="end-stats">
-      <h2>Erinnerungen: ${collectedItems} / ${totalItems}</h2>
+    <h1>🎂 Die Diagnose 🎂</h1>
+    <p>70 Jahre durchgelaufen — von Wirtschaftswunder bis morgen.</p>
+    <div class="stats">
+      <div class="verdict">${v.verdict}</div>
+      <p style="margin:6px 0">${v.comment}</p>
     </div>
-    ${extras}
-    <p>Auf die nächsten Jahrzehnte – mit Lederhose, Schäufele und einer kühlen Maß. 🍺</p>
+    <div class="stats">
+      <p>⭐ Erinnerungen: <b>${score} / ${v.totalItems}</b></p>
+      <p>🤕 Stolperer: <b>${stumbles}</b></p>
+      <p>⏱️ Zeit: <b>${mins}:${secs}</b></p>
+    </div>
+    <p style="font-size:14px;opacity:.9">Alles Gute zum 70., Josef! 🍻</p>
     <button id="restartBtn">Nochmal!</button>
   `;
   document.getElementById('restartBtn').addEventListener('click', restart);
@@ -902,15 +1130,15 @@ function showEnd() {
 function restart() {
   for (const t of things) t.collected = false;
   player.x = 30; player.y = 0; player.vx = 0; player.vy = 0; player.onGround = true;
-  camX = 0; score = 0; finished = false; lastEraName = '';
+  camX = 0; score = 0; stumbles = 0; finished = false; lastEraName = '';
   hudScore.textContent = 0;
   hudEra.textContent = '';
   overlay.innerHTML = `
-    <h1>🎂 Alles Gute, Josef! 🎂</h1>
-    <p><b>Eine kleine Zeitreise durch 70 Jahre</b> — vom Buam aus Sengenthal bis zum Opa von Hannah und Linda.</p>
-    <p>Sammle Erinnerungen, spring über Hindernisse, lauf bis zur Geburtstagstorte.</p>
-    <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. Am PC: Pfeiltasten + Leertaste.</p>
-    <button id="startBtn">Los geht's!</button>
+    <h1>🏃‍♂️ Josefs großer Fitness-Test 🏃‍♂️</h1>
+    <p><b>Morgen wirst du 70.</b> Aber bist du noch fit genug dafür?</p>
+    <p>Lauf durch dein Leben – von '56 bis morgen – und beweis dass du's noch drauf hast. Wir messen Sterne ⭐, Stolperer 🤕 und Zeit ⏱️.</p>
+    <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. PC: Pfeiltasten + Leertaste.</p>
+    <button id="startBtn">Auf geht's, alter Mann! 💪</button>
   `;
   document.getElementById('startBtn').addEventListener('click', start);
   overlay.classList.remove('hidden');
@@ -920,6 +1148,7 @@ function start() {
   overlay.classList.add('hidden');
   controls.classList.remove('hidden');
   running = true;
+  startTime = performance.now();
 }
 
 document.getElementById('startBtn').addEventListener('click', start);
