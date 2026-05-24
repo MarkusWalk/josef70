@@ -280,6 +280,33 @@ push({ type:'item', kind:'star', x: 10450, y: -56 });
 push({ type:'item', kind:'heart', x: 10500, y: -42 });
 push({ type:'goal', kind:'cake', x: 10580, y: 0 });
 
+// === Bayerische & fränkische Spezialitäten quer durchs Leben verteilt ===
+push({ type:'item', kind:'schaeufele',  x: 320,   y: -22 });
+push({ type:'item', kind:'brezel',      x: 700,   y: -42 });
+push({ type:'item', kind:'leberkaes',   x: 1080,  y: -24 });
+push({ type:'item', kind:'brezel',      x: 1500,  y: -42 });
+push({ type:'item', kind:'nurnberger',  x: 2120,  y: -22 });
+push({ type:'item', kind:'leberkaes',   x: 2560,  y: -22 });
+push({ type:'item', kind:'bier',        x: 2860,  y: -22 });
+push({ type:'item', kind:'turmeulen',   x: 3700,  y: -40 });
+push({ type:'item', kind:'nurnberger',  x: 3950,  y: -22 });
+push({ type:'item', kind:'brezel',      x: 4470,  y: -42 });
+push({ type:'item', kind:'zipferl',     x: 4760,  y: -22 });
+push({ type:'item', kind:'wellington',  x: 5510,  y: -40 });  // Hochzeit-Festessen
+push({ type:'item', kind:'brezel',      x: 6020,  y: -42 });
+push({ type:'item', kind:'bier',        x: 6680,  y: -22 });
+push({ type:'item', kind:'schaeufele',  x: 7100,  y: -22 });
+push({ type:'item', kind:'zipferl',     x: 7440,  y: -22 });
+push({ type:'item', kind:'bier',        x: 7900,  y: -22 });
+push({ type:'item', kind:'turmeulen',   x: 8300,  y: -40 });
+push({ type:'item', kind:'brezel',      x: 8920,  y: -42 });
+push({ type:'item', kind:'nurnberger',  x: 9180,  y: -22 });
+push({ type:'item', kind:'leberkaes',   x: 9460,  y: -22 });
+push({ type:'item', kind:'schaeufele',  x: 9900,  y: -22 });
+push({ type:'item', kind:'wellington',  x: 10200, y: -40 });
+push({ type:'item', kind:'bier',        x: 10380, y: -22 });
+push({ type:'item', kind:'turmeulen',   x: 10520, y: -40 });
+
 const player = {
   x: 30, y: 0, vx: 0, vy: 0, w: 12, h: 22, onGround: true, facing: 1,
   walkPhase: 0, hurtT: 0,
@@ -489,18 +516,107 @@ const SPR = {
     "..BBBBB..",
     ".BBLLLBB.",
     "BBLRRRLBB",
-    "BLR R RLB",
     "BLRRRRRLB",
-    "BLR R RLB",
+    "BLRRRRRLB",
+    "BLRRRRRLB",
     "BBLRRRLBB",
     ".BBLLLBB.",
     "..BBBBB..",
+  ],
+  brezel: [
+    "..TTTTTT..",
+    ".TWTTTTTW.",
+    "TWTT..TTWT",
+    "TW..TT..WT",
+    ".TTTWWTTT.",
+    "..TTWWTT..",
+    "...TTTT...",
+  ],
+  leberkaes: [
+    "IIIIIIIIII",
+    "IEEEEEEEEI",
+    "EFFFFFFFFE",
+    "EEEEEEEEEE",
+    "IIIIIIIIII",
+  ],
+  nurnberger: [
+    ".HHHHHHHH.",
+    "HHHHHHHHHH",
+    "HHHHHHHHHH",
+    ".HHHHHHHH.",
+    "..........",
+    ".HHHHHHHH.",
+    "HHHHHHHHHH",
+    "HHHHHHHHHH",
+    ".HHHHHHHH.",
+  ],
+  schaeufele: [
+    "..IIIIII..",
+    ".IAAAARAI.",
+    "IAARARAAAI",
+    "IAARARAAAI",
+    "IAAAAAAARI",
+    ".IAAAAAAI.",
+    "..IWWWWI..",
+    "...WWWW...",
+  ],
+  turmeulen: [
+    "..O....O..",
+    ".OOO..OOO.",
+    "OOYOOOOYOO",
+    "OOYNOONYOO",
+    "OOYOOOOYOO",
+    ".OOOOOOOO.",
+    ".OOOOOOOO.",
+    "..OOOOOO..",
+    "...OOOO...",
+  ],
+  wellington: [
+    ".QQQQQQQQ.",
+    "QQQQQQQQQQ",
+    "QQAAAAAAQQ",
+    "QQAAAAAAQQ",
+    "QQQQQQQQQQ",
+    ".QQQQQQQQ.",
+  ],
+  zipferl: [
+    "....Z.....",
+    "...HHH....",
+    "..HHHHH...",
+    ".HHHHHHH..",
+    ".HHHHHHHH.",
+    "..HHHHHH..",
+    "...HHHH...",
+    ".....Z....",
+  ],
+  bier: [
+    "..KKKKKK..",
+    ".KWWWWWWK.",
+    "KWJJJJJJWK",
+    "KWJJJJJJWK",
+    "KWJJJJJJWK",
+    "KWJJJJJJWK",
+    "KWJJJJJJWK",
+    ".KWWWWWWK.",
+    "..KKKKKK..",
   ],
 };
 const ITEM_PAL = {
   Y:'#ffd700', R:'#c83030', P:'#ff6688',
   C:'#d4d4d4', D:'#8a6a20', M:'#caa030',
   B:'#1a1a1a', L:'#3a3a3a',
+  W:'#f8f4ec', N:'#1a1a1a',
+  T:'#7a4a14',  // Brezel
+  I:'#e8c890',  // Brot/Teig hell
+  E:'#c88858',  // Leberkäs
+  F:'#ffaa30',  // Senf
+  H:'#a86838',  // Wurst
+  A:'#a05838',  // Schwein/Fleisch
+  O:'#4a2a10',  // Schoko (Turmeule)
+  Q:'#e8c890',  // Teig Wellington
+  Z:'#88c8a8',  // Sauer Sud
+  J:'#e8b830',  // Bier
+  K:'#888888',  // Krug
 };
 
 function drawItem(it, sx, sy) {
@@ -1145,8 +1261,14 @@ function update(dt) {
       it.collected = true;
       score++;
       hudScore.textContent = score;
-      const labels = { star:'+1 ⭐', heart:'+1 ❤️', dmark:'+1 💰', vinyl:'+1 💿' };
-      showToast(labels[it.kind] || '+1', 700);
+      const labels = {
+        star:'+1 ⭐', heart:'+1 ❤️', dmark:'+1 💰 D-Mark', vinyl:'+1 💿 Schallplatte',
+        brezel:'+1 🥨 Brezn!', leberkaes:'+1 🥩 Leberkäs!',
+        nurnberger:'+1 🌭 Nürnberger!', schaeufele:'+1 🍖 Schäufele!',
+        turmeulen:'+1 🦉 Turmeule!', wellington:'+1 🥩 Wellington!',
+        zipferl:'+1 🌶️ Saure Zipferl!', bier:'+1 🍺 Bier!',
+      };
+      showToast(labels[it.kind] || '+1', 800);
     }
   }
 
