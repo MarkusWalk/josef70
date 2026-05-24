@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Josefs Fitness-Test – Bist du fit für die 70?</title>
+<link rel="preload" as="image" href="josef.png" fetchpriority="high">
+<link rel="icon" href="josef.png">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; -webkit-user-select:none; touch-action:manipulation; }
   html, body { width:100%; height:100%; overflow:hidden; background:#000; font-family: -apple-system, system-ui, sans-serif; }
@@ -23,6 +25,8 @@
   #overlay .small { font-size:13px; opacity:.8; }
   #overlay button { margin-top:18px; padding:14px 30px; font-size:18px; background:#ffd700; color:#000; border:none; border-radius:10px; font-weight:bold; cursor:pointer; }
   #overlay button:active { transform:scale(0.96); }
+  #overlay button:disabled { background:#888; color:#ddd; cursor:wait; opacity:0.7; }
+  #overlay button:disabled:active { transform:none; }
   .hidden { display:none !important; }
   .stats { background:rgba(255,255,255,0.08); padding:14px 20px; border-radius:8px; margin:12px 0; max-width:440px; }
   .verdict { font-size:22px; color:#ffd700; font-weight:bold; margin:8px 0; }
@@ -45,7 +49,7 @@
   <p><b>Morgen wirst du 70.</b> Aber bist du noch fit genug dafür?</p>
   <p>Lauf durch dein Leben – von '56 bis morgen – und beweis dass du's noch drauf hast. Wir messen Sterne ⭐, Stolperer 🤕 und Zeit ⏱️.</p>
   <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. PC: Pfeiltasten + Leertaste.</p>
-  <button id="startBtn">Auf geht's, alter Mann! 💪</button>
+  <button id="startBtn" disabled>Lade Josef...</button>
 </div>
 
 <script>
@@ -401,10 +405,33 @@ const JOSEF_PAL_BODY = {
 };
 
 const josefImg = new Image();
+josefImg.decoding = 'async';
 let josefImgReady = false;
-josefImg.onload  = () => { josefImgReady = true; console.log('Josef-Foto geladen'); };
-josefImg.onerror = () => { console.warn('Josef-Foto nicht ladbar — Pixel-Kopf bleibt'); };
-josefImg.src = 'josef.png';
+
+function setStartReady() {
+  const btn = document.getElementById('startBtn');
+  if (btn) { btn.disabled = false; btn.textContent = "Auf geht's, alter Mann! 💪"; }
+}
+function setStartFailed() {
+  const btn = document.getElementById('startBtn');
+  if (btn) { btn.disabled = false; btn.textContent = "Los geht's (ohne Foto)"; }
+}
+
+(async () => {
+  try {
+    await new Promise((resolve, reject) => {
+      josefImg.onload = resolve;
+      josefImg.onerror = reject;
+      josefImg.src = 'josef.png';
+    });
+    if (josefImg.decode) { try { await josefImg.decode(); } catch (e) {} }
+    josefImgReady = true;
+    setStartReady();
+  } catch (e) {
+    console.warn('Josef-Foto nicht ladbar — Pixel-Kopf bleibt');
+    setStartFailed();
+  }
+})();
 
 function drawJosef() {
   const grid = !player.onGround ? JOSEF_JUMP
@@ -1300,7 +1327,7 @@ function restart() {
     <p><b>Morgen wirst du 70.</b> Aber bist du noch fit genug dafür?</p>
     <p>Lauf durch dein Leben – von '56 bis morgen – und beweis dass du's noch drauf hast. Wir messen Sterne ⭐, Stolperer 🤕 und Zeit ⏱️.</p>
     <p class="small">Tippe ▶ zum Laufen, ▲ zum Springen. PC: Pfeiltasten + Leertaste.</p>
-    <button id="startBtn">Auf geht's, alter Mann! 💪</button>
+    <button id="startBtn" disabled>Lade Josef...</button>
   `;
   document.getElementById('startBtn').addEventListener('click', start);
   overlay.classList.remove('hidden');
