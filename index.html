@@ -80,7 +80,7 @@ const GROUND_H = 28;
 const GRAVITY = 0.55;
 const JUMP_V = -9.2;
 const RUN_SPEED = 1.55;
-const WORLD_END = 9000;
+const WORLD_END = 10800;
 
 const ERAS = [
   { name: "1956 · Wirtschaftswunder",   start: 0,    sky:'#9bd0f5', ground:'#7ba35a' },
@@ -92,12 +92,16 @@ const ERAS = [
   { name: "1972 · Olympia München",     start: 3600, sky:'#88c8f0', ground:'#7ba35a' },
   { name: "1973 · Ölkrise",             start: 4200, sky:'#e8b878', ground:'#9a8458' },
   { name: "1977 · Star Wars",           start: 4800, sky:'#1a1040', ground:'#3a3a4a' },
-  { name: "1983 · 99 Luftballons",      start: 5400, sky:'#ffaab8', ground:'#7ba35a' },
-  { name: "1989 · Mauerfall!",          start: 6000, sky:'#5a6088', ground:'#6e6e6e' },
-  { name: "2000 · Millennium",          start: 6700, sky:'#1a1a4a', ground:'#7ba35a' },
-  { name: "2010 · Smartphone-Zeit",     start: 7300, sky:'#bce0ee', ground:'#7ba35a' },
-  { name: "2020er · Sofa & Streaming",  start: 7900, sky:'#d0c0e8', ground:'#7ba35a' },
-  { name: "Morgen · Josefs 70er!",      start: 8500, sky:'#ffb8d8', ground:'#7ba35a' },
+  { name: "1979 · Hochzeit Dorothee",   start: 5400, sky:'#ffd0e0', ground:'#7ba35a' },
+  { name: "1980 · Sohn Martin",         start: 5800, sky:'#bce0ee', ground:'#7ba35a' },
+  { name: "1983 · 99 Luftballons",      start: 6200, sky:'#ffaab8', ground:'#7ba35a' },
+  { name: "1989 · Mauerfall!",          start: 6800, sky:'#5a6088', ground:'#6e6e6e' },
+  { name: "2000 · Millennium",          start: 7500, sky:'#1a1a4a', ground:'#7ba35a' },
+  { name: "2010 · Smartphone-Zeit",     start: 8100, sky:'#bce0ee', ground:'#7ba35a' },
+  { name: "2017 · Enkelin Hannah",      start: 8700, sky:'#ffe0c0', ground:'#7ba35a' },
+  { name: "2019 · Enkelin Linda",       start: 9100, sky:'#ffe0d8', ground:'#7ba35a' },
+  { name: "2020er · Sofa & Streaming",  start: 9500, sky:'#d0c0e8', ground:'#7ba35a' },
+  { name: "Morgen · Josefs 70er!",      start: 10100, sky:'#ffb8d8', ground:'#7ba35a' },
 ];
 
 function currentEra(x) {
@@ -199,54 +203,78 @@ push({ type:'item', kind:'star', x: 5170, y: -52 });
 push({ type:'scenery', kind:'vader', x: 5260, y: 0 });
 push({ type:'item', kind:'star', x: 5340, y: -40 });
 
+// === 1979 Hochzeit Dorothee ===
+push({ type:'sign', x: 5470, text:'1979 · Hochzeit Dorothee' });
+push({ type:'scenery', kind:'chapel', x: 5580, y: 0 });
+push({ type:'scenery', kind:'bride', x: 5680, y: 0 });
+push({ type:'item', kind:'heart', x: 5760, y: -42 });
+
+// === 1980 Sohn Martin ===
+push({ type:'sign', x: 5870, text:'1980 · Martin geboren' });
+push({ type:'scenery', kind:'cradle', x: 5980, y: 0 });
+push({ type:'item', kind:'heart', x: 6060, y: -38 });
+push({ type:'obstacle', kind:'stone', x: 6130, w:18, h:14 });
+
 // === 1983 99 Luftballons ===
-push({ type:'sign', x: 5470, text:"99 Luftballons" });
-push({ type:'scenery', kind:'balloon', x: 5570, y: -50 });
-push({ type:'scenery', kind:'balloon', x: 5640, y: -68 });
-push({ type:'scenery', kind:'balloon', x: 5710, y: -54 });
-push({ type:'scenery', kind:'balloon', x: 5780, y: -72 });
-push({ type:'item', kind:'vinyl', x: 5850, y: -42 });
-push({ type:'obstacle', kind:'stone', x: 5920, w:18, h:14 });
+push({ type:'sign', x: 6270, text:"99 Luftballons" });
+push({ type:'scenery', kind:'balloon', x: 6370, y: -50 });
+push({ type:'scenery', kind:'balloon', x: 6440, y: -68 });
+push({ type:'scenery', kind:'balloon', x: 6510, y: -54 });
+push({ type:'scenery', kind:'balloon', x: 6580, y: -72 });
+push({ type:'item', kind:'vinyl', x: 6650, y: -42 });
+push({ type:'obstacle', kind:'stone', x: 6720, w:18, h:14 });
 
 // === 1989 Mauerfall ===
-push({ type:'sign', x: 6060, text:'9. November 1989' });
-push({ type:'scenery', kind:'gate', x: 6180, y: 0 });
-push({ type:'obstacle', kind:'wallBroken', x: 6340, w:20, h:42 });
-push({ type:'item', kind:'star', x: 6410, y: -54 });
-push({ type:'scenery', kind:'trabi', x: 6510, y: 0 });
-push({ type:'item', kind:'dmark', x: 6590, y: -22 });
+push({ type:'sign', x: 6860, text:'9. November 1989' });
+push({ type:'scenery', kind:'gate', x: 6980, y: 0 });
+push({ type:'obstacle', kind:'wallBroken', x: 7140, w:20, h:42 });
+push({ type:'item', kind:'star', x: 7210, y: -54 });
+push({ type:'scenery', kind:'trabi', x: 7310, y: 0 });
+push({ type:'item', kind:'dmark', x: 7390, y: -22 });
 
 // === 2000 Millennium ===
-push({ type:'sign', x: 6750, text:'2000 · Prosit!' });
-push({ type:'scenery', kind:'firework', x: 6870, y: -80 });
-push({ type:'scenery', kind:'firework', x: 6950, y: -100 });
-push({ type:'item', kind:'star', x: 7020, y: -42 });
-push({ type:'obstacle', kind:'stone', x: 7100, w:18, h:14 });
-push({ type:'item', kind:'star', x: 7180, y: -50 });
+push({ type:'sign', x: 7550, text:'2000 · Prosit!' });
+push({ type:'scenery', kind:'firework', x: 7670, y: -80 });
+push({ type:'scenery', kind:'firework', x: 7750, y: -100 });
+push({ type:'item', kind:'star', x: 7820, y: -42 });
+push({ type:'obstacle', kind:'stone', x: 7900, w:18, h:14 });
+push({ type:'item', kind:'star', x: 7980, y: -50 });
 
 // === 2010 Smartphone ===
-push({ type:'sign', x: 7350, text:'Smile! 📱' });
-push({ type:'scenery', kind:'selfie', x: 7470, y: 0 });
-push({ type:'item', kind:'heart', x: 7550, y: -40 });
-push({ type:'item', kind:'star', x: 7620, y: -50 });
-push({ type:'obstacle', kind:'stone', x: 7700, w:18, h:14 });
-push({ type:'item', kind:'star', x: 7780, y: -38 });
+push({ type:'sign', x: 8150, text:'Smile! 📱' });
+push({ type:'scenery', kind:'selfie', x: 8270, y: 0 });
+push({ type:'item', kind:'heart', x: 8350, y: -40 });
+push({ type:'item', kind:'star', x: 8420, y: -50 });
+push({ type:'obstacle', kind:'stone', x: 8500, w:18, h:14 });
+push({ type:'item', kind:'star', x: 8580, y: -38 });
+
+// === 2017 Enkelin Hannah ===
+push({ type:'sign', x: 8770, text:'2017 · Enkelin Hannah' });
+push({ type:'scenery', kind:'hannah', x: 8870, y: 0 });
+push({ type:'item', kind:'heart', x: 8950, y: -42 });
+push({ type:'item', kind:'star', x: 9030, y: -38 });
+
+// === 2019 Enkelin Linda ===
+push({ type:'sign', x: 9170, text:'2019 · Enkelin Linda' });
+push({ type:'scenery', kind:'linda', x: 9270, y: 0 });
+push({ type:'item', kind:'heart', x: 9350, y: -42 });
+push({ type:'item', kind:'star', x: 9430, y: -38 });
 
 // === 2020er Sofa ===
-push({ type:'sign', x: 7940, text:'Couch-Modus' });
-push({ type:'scenery', kind:'sofa', x: 8060, y: 0 });
-push({ type:'scenery', kind:'tvBig', x: 8170, y: 0 });
-push({ type:'item', kind:'heart', x: 8260, y: -36 });
-push({ type:'obstacle', kind:'stone', x: 8340, w:18, h:14 });
-push({ type:'item', kind:'star', x: 8420, y: -42 });
+push({ type:'sign', x: 9540, text:'Couch-Modus' });
+push({ type:'scenery', kind:'sofa', x: 9660, y: 0 });
+push({ type:'scenery', kind:'tvBig', x: 9770, y: 0 });
+push({ type:'item', kind:'heart', x: 9860, y: -36 });
+push({ type:'obstacle', kind:'stone', x: 9940, w:18, h:14 });
+push({ type:'item', kind:'star', x: 10020, y: -42 });
 
 // === 2026 70er ===
-push({ type:'sign', x: 8580, text:'Alles Gute, Josef!' });
-push({ type:'scenery', kind:'banner', x: 8700, y: 0 });
-push({ type:'item', kind:'heart', x: 8790, y: -42 });
-push({ type:'item', kind:'star', x: 8850, y: -56 });
-push({ type:'item', kind:'heart', x: 8900, y: -42 });
-push({ type:'goal', kind:'cake', x: 8980, y: 0 });
+push({ type:'sign', x: 10180, text:'Alles Gute, Josef!' });
+push({ type:'scenery', kind:'banner', x: 10300, y: 0 });
+push({ type:'item', kind:'heart', x: 10390, y: -42 });
+push({ type:'item', kind:'star', x: 10450, y: -56 });
+push({ type:'item', kind:'heart', x: 10500, y: -42 });
+push({ type:'goal', kind:'cake', x: 10580, y: 0 });
 
 const player = {
   x: 30, y: 0, vx: 0, vy: 0, w: 12, h: 22, onGround: true, facing: 1,
@@ -768,6 +796,130 @@ function drawBanner(x, gy) {
   px(x-4, gy-66, 92, 1, '#3a3a3a');
 }
 
+function drawChapel(x, gy) {
+  // Kapelle mit Kreuz und Türbogen
+  px(x, gy-30, 24, 30, '#f4e8d0');
+  px(x+2, gy-30, 20, 1, '#caa078');
+  // Spitzdach
+  px(x+2, gy-38, 20, 8, '#a83030');
+  px(x+4, gy-44, 16, 6, '#a83030');
+  px(x+8, gy-48, 8, 4, '#a83030');
+  // Kreuz
+  px(x+11, gy-56, 2, 8, '#caa030');
+  px(x+9, gy-52, 6, 2, '#caa030');
+  // Türbogen
+  px(x+10, gy-18, 4, 18, '#6a4a20');
+  px(x+9, gy-20, 6, 2, '#6a4a20');
+  // Fenster
+  px(x+4, gy-26, 3, 4, '#3a3a8a');
+  px(x+17, gy-26, 3, 4, '#3a3a8a');
+}
+
+function drawBride(x, gy) {
+  // Dorothee im Brautkleid (Dirndl-weiß) — größer, mit Schleier
+  px(x+4, gy-30, 8, 6, '#f4caa0');     // Gesicht
+  px(x+3, gy-32, 10, 4, '#caa050');     // Haare braun
+  // Schleier
+  px(x+1, gy-32, 14, 2, '#f8f8f8');
+  px(x+0, gy-30, 2, 8, '#f8f8f8');
+  px(x+14, gy-30, 2, 8, '#f8f8f8');
+  // Augen + Lächeln
+  px(x+6, gy-27, 1, 1, '#000');
+  px(x+9, gy-27, 1, 1, '#000');
+  px(x+6, gy-24, 4, 1, '#a83030');
+  // Brautkleid
+  px(x+2, gy-22, 12, 22, '#ffffff');
+  px(x+1, gy-12, 14, 12, '#ffffff');
+  px(x+0, gy-2,  16, 2,  '#ffffff');
+  // Bouquet
+  px(x+11, gy-18, 4, 4, '#3a8a3a');
+  px(x+12, gy-20, 2, 2, '#c83030');
+  px(x+14, gy-19, 1, 2, '#caa030');
+  // Hochzeitsring schwebt darüber
+  px(x+6, gy-40, 4, 4, '#caa030');
+  px(x+7, gy-39, 2, 2, '#ffd700');
+}
+
+function drawCradle(x, gy) {
+  // Wiege mit Baby Martin
+  // Beine
+  px(x+1, gy-4, 2, 4, '#7a4a20');
+  px(x+21, gy-4, 2, 4, '#7a4a20');
+  // Korb
+  px(x, gy-16, 24, 12, '#caa078');
+  px(x, gy-16, 24, 2, '#a87838');
+  px(x, gy-6, 24, 2, '#7a5828');
+  // Gitterstäbe
+  for (let i=0;i<6;i++) px(x+2+i*4, gy-14, 1, 8, '#7a5828');
+  // Decke
+  px(x+4, gy-14, 16, 4, '#a0d8e8');
+  px(x+4, gy-14, 16, 1, '#88c8e0');
+  // Baby Kopf
+  px(x+10, gy-20, 4, 4, '#f4caa0');
+  px(x+9, gy-21, 6, 1, '#caa050');
+  px(x+11, gy-19, 1, 1, '#000');
+  px(x+12, gy-19, 1, 1, '#000');
+  // Schnuller
+  px(x+11, gy-17, 2, 1, '#ff8888');
+  // "Martin" Schild
+  ctx.fillStyle='#fff'; ctx.font='bold 6px monospace'; ctx.textAlign='center';
+  ctx.fillText('Martin', x+12, gy-26);
+}
+
+function drawHannah(x, gy) {
+  // Kleines Mädchen mit Zopf in rosa
+  // Beine
+  px(x+4, gy-8, 2, 8, '#f4caa0');
+  px(x+8, gy-8, 2, 8, '#f4caa0');
+  // Schuhe
+  px(x+3, gy-2, 3, 2, '#c83030');
+  px(x+8, gy-2, 3, 2, '#c83030');
+  // Kleid rosa
+  px(x+2, gy-18, 10, 10, '#ff88a8');
+  px(x+1, gy-12, 12, 2, '#ff88a8');
+  // Gesicht
+  px(x+3, gy-26, 8, 8, '#f4caa0');
+  px(x+5, gy-24, 1, 1, '#000');
+  px(x+8, gy-24, 1, 1, '#000');
+  px(x+5, gy-21, 4, 1, '#a83030');
+  // Haare blond mit Zopf
+  px(x+2, gy-28, 10, 4, '#e8c870');
+  px(x+1, gy-26, 2, 6, '#e8c870');
+  px(x+11, gy-26, 2, 6, '#e8c870');
+  // Schleife
+  px(x+11, gy-28, 3, 2, '#c83030');
+  // Schild
+  ctx.fillStyle='#fff'; ctx.font='bold 7px monospace'; ctx.textAlign='center';
+  ctx.fillText('Hannah', x+7, gy-36);
+}
+
+function drawLinda(x, gy) {
+  // Kleines Mädchen mit Zopf in lila
+  // Beine
+  px(x+4, gy-8, 2, 8, '#f4caa0');
+  px(x+8, gy-8, 2, 8, '#f4caa0');
+  // Schuhe
+  px(x+3, gy-2, 3, 2, '#3464a8');
+  px(x+8, gy-2, 3, 2, '#3464a8');
+  // Kleid lila
+  px(x+2, gy-18, 10, 10, '#b888d8');
+  px(x+1, gy-12, 12, 2, '#b888d8');
+  // Gesicht
+  px(x+3, gy-26, 8, 8, '#f4caa0');
+  px(x+5, gy-24, 1, 1, '#000');
+  px(x+8, gy-24, 1, 1, '#000');
+  px(x+5, gy-21, 4, 1, '#a83030');
+  // Haare braun mit Zöpfen
+  px(x+2, gy-28, 10, 4, '#8a5a20');
+  px(x+0, gy-26, 2, 8, '#8a5a20');
+  px(x+12, gy-26, 2, 8, '#8a5a20');
+  // Schleife
+  px(x+0, gy-28, 3, 2, '#88c8a8');
+  // Schild
+  ctx.fillStyle='#fff'; ctx.font='bold 7px monospace'; ctx.textAlign='center';
+  ctx.fillText('Linda', x+7, gy-36);
+}
+
 function drawObstacle(o, gy) {
   if (o.kind === 'stone') {
     px(o.x, gy-o.h, o.w, o.h, '#888');
@@ -813,7 +965,7 @@ for (let i=0;i<80;i++) moonStars.push({ x: 3000 + Math.random()*600, y: 10 + Mat
 const swStars = [];
 for (let i=0;i<60;i++) swStars.push({ x: 4800 + Math.random()*600, y: 10 + Math.random()*70 });
 const milStars = [];
-for (let i=0;i<70;i++) milStars.push({ x: 6700 + Math.random()*600, y: 10 + Math.random()*80 });
+for (let i=0;i<70;i++) milStars.push({ x: 7500 + Math.random()*600, y: 10 + Math.random()*80 });
 const sputnikStars = [];
 for (let i=0;i<60;i++) sputnikStars.push({ x: 600 + Math.random()*600, y: 8 + Math.random()*70 });
 
@@ -1056,6 +1208,11 @@ function render() {
         case 'selfie':          drawSelfie(sx, gy); break;
         case 'sofa':            drawSofa(sx, gy); break;
         case 'tvBig':           drawTvBig(sx, gy); break;
+        case 'chapel':          drawChapel(sx, gy); break;
+        case 'bride':           drawBride(sx, gy); break;
+        case 'cradle':          drawCradle(sx, gy); break;
+        case 'hannah':          drawHannah(sx, gy); break;
+        case 'linda':           drawLinda(sx, gy); break;
         case 'banner':          drawBanner(sx, gy); break;
       }
     } else if (t.type === 'sign') {
