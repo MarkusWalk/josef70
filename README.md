@@ -12,3 +12,8 @@ Ein kleines Geburtstagsspiel: Josef läuft in Lederhose durch 70 Jahre deutscher
 🍺 Bier · 🥨 Brezn · 🥩 Leberkäs · ❤️ Herzen · ⭐ Sterne · 💰 D-Mark
 
 Alles Gute, Josef! 🎂
+
+
+PS: Auch von mir, unbekannterweise, alles Gute zum Geburstag. 
+Schöne Grüße aus dem Frankenwald
+Martin
